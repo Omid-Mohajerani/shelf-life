@@ -16,6 +16,7 @@ from __future__ import annotations
 import asyncio
 import os
 import re
+import time
 from datetime import date, datetime
 
 import httpx
@@ -53,7 +54,12 @@ CHANNEL_PROMPT = (
 
 
 async def _ask(client: httpx.AsyncClient, question: str, dataset: str,
-               prompt: str) -> str:
+               prompt: str) -> tuple[str, int]:
+    t0 = time.perf_counter()
+
+    def ms() -> int:
+        return int((time.perf_counter() - t0) * 1000)
+
     try:
         r = await client.post(f"{BASE}/api/v1/search", json={
             "searchType": "GRAPH_COMPLETION", "query": question,
@@ -61,17 +67,20 @@ async def _ask(client: httpx.AsyncClient, question: str, dataset: str,
             "includeReferences": False,
         }, timeout=120)
         if r.status_code != 200:
-            return f"(unavailable: HTTP {r.status_code})"
-        return r.json()[0]["search_result"][0].split("Evidence:")[0].strip()
+            return f"(unavailable: HTTP {r.status_code})", ms()
+        return r.json()[0]["search_result"][0].split("Evidence:")[0].strip(), ms()
     except Exception as e:
-        return f"(unavailable: {type(e).__name__})"
+        return f"(unavailable: {type(e).__name__})", ms()
 
 
-def _evidence(question: str, limit: int = 6) -> list[dict]:
+def _evidence(question: str, limit: int = 6) -> tuple[list[dict], int, int]:
     """The messages behind the answer. Their metadata is what we judge."""
+    t0 = time.perf_counter()
     qv = next(iter(_embedder.query_embed(question))).tolist()
     hits = _qdrant.query_points(COLLECTION, query=qv, limit=limit).points
-    return [{**h.payload, "score": h.score} for h in hits]
+    total = _qdrant.get_collection(COLLECTION).points_count
+    return ([{**h.payload, "score": h.score} for h in hits],
+            int((time.perf_counter() - t0) * 1000), total)
 
 
 def _age_days(d: str) -> int:
@@ -147,7 +156,8 @@ def assess(question: str, evidence: list[dict]) -> dict:
         "ask": sorted(contributors.values(), key=lambda c: (-c["n"], c["latest"]))[:2],
         "evidence": [{"date": e["date"], "author": e["author"], "text": e["text"][:400],
                       "unproven": e.get("unproven", False),
-                      "supersedes": e.get("supersedes")} for e in evidence[:4]],
+                      "supersedes": e.get("supersedes")}
+                     for e in sorted(evidence[:4], key=lambda x: x["date"])],
     }
 
 
@@ -169,6 +179,18 @@ def _admits_nothing(text: str) -> bool:
     return False
 
 
+def verdict_only(question: str) -> dict:
+    """The trust verdict, from Qdrant alone. ~150ms.
+
+    This is the point of computing trust from metadata instead of asking a model:
+    the verdict, the evidence and who to ask do not need an LLM at all. The two
+    graph-distilled answers take fifteen seconds and arrive afterwards.
+    """
+    evidence, q_ms, q_total = _evidence(question)
+    return {"question": question, "trust": assess(question, evidence),
+            "timing": {"qdrant_ms": q_ms, "qdrant_points": q_total}}
+
+
 async def answer(question: str) -> dict:
     """Both sources, in parallel, then a verdict computed from the evidence."""
     async with httpx.AsyncClient(headers=AUTH) as client:
@@ -176,13 +198,15 @@ async def answer(question: str) -> dict:
             _ask(client, question, DS_DOCS, DOCS_PROMPT),
             _ask(client, question, DS_CHANNEL, CHANNEL_PROMPT),
         )
-    evidence = _evidence(question)
+    (docs, docs_ms), (channel, chan_ms) = docs, channel
+    evidence, q_ms, q_total = _evidence(question)
     trust = assess(question, evidence)
 
-    docs_silent = _admits_nothing(docs)
     return {
         "question": question,
-        "docs": {"answer": docs, "silent": docs_silent},
-        "channel": {"answer": channel},
+        "docs": {"answer": docs, "silent": _admits_nothing(docs), "ms": docs_ms},
+        "channel": {"answer": channel, "ms": chan_ms},
         "trust": trust,
+        "timing": {"cognee_docs_ms": docs_ms, "cognee_channel_ms": chan_ms,
+                   "qdrant_ms": q_ms, "qdrant_points": q_total},
     }
