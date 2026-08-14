@@ -1,0 +1,68 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-31",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "acl",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Meridian VoiceConnect trunk: outbound is fine, inbound never arrives. No error anywhere. Trunk looks half alive."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-31",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "acl",
+    "unproven": false,
+    "supersedes": null,
+    "text": "What's in the IP Access Control List?"
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-31",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "acl",
+    "unproven": false,
+    "supersedes": null,
+    "text": "The AudioCodes hostname - qqjjgaaaqdcr.sip1-region1.audiocodes.io. It resolves to the right IP, I checked."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-31",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "acl",
+    "unproven": false,
+    "supersedes": null,
+    "text": "That's it. The VC ACL does not resolve host names, it compares the literal value. A resolving implementation would have matched, so we know it doesn't. Put 198.51.100.15/32 in there."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-31",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "acl",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Inbound working. That would have taken me another day."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-31",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "acl",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Whitelist the media address too - 198.51.100.49. Signalling and media are different hosts and people miss the second one."
+  }
+]

@@ -1,87 +1,82 @@
-# Clearance
+# Shelf Life
 
-**Your Slack has a memory now, and it knows what you're cleared to know.**
+**Every answer in a company has one.**
 
 Built for *Give Your Slack a Memory* — the Cognee × Qdrant Hack Night, Berlin, 2026-08-14.
+
+**Live:** https://shelflife.ringamo.dev
 
 ---
 
 ## The problem
 
-Point an AI at your Slack and it answers beautifully — and it answers *everyone* from
-*everything*, including the private channels they cannot see.
+Your team's real knowledge is not in the docs. It's in a channel, in a thread, three
+replies down, written eighteen months ago by someone who has since left.
 
-The leak is not a copied message. **The model works the secret out.** Nobody has to be shown
-a private document for the secret to escape, which is exactly why document-level permissions
-do not catch it.
+So you search. And you find *something*. And you have no idea whether it is still true.
 
-## The demo
+That's not a retrieval problem — retrieval works fine. It's a **trust** problem:
 
-The workspace has a hiring freeze. `#eng` has the **fact**: *"freezing new hires until Q4."*
-Only `#leadership-private` has the **reason** — an acquisition closing, and leadership wanting
-headcount flat for diligence. Ana even writes: *"announce it as a freeze until Q4. Do not give
-a reason."*
+- The official docs are **confidently wrong** about this specific case.
+- The real answer was pieced together across five messages: a symptom, a wrong guess,
+  a diagnosis, a fix, and a better fix.
+- Someone answered this in 2025 and someone else **overturned it** in 2026.
+- The person who wrote the answer **said themselves they weren't sure** — and was later
+  proved wrong.
 
-**Sam is a contractor** in `#eng` and `#general`. He is not in `#leadership-private`.
+A vector search returns all of that, ranked by similarity, with no way to tell which is which.
 
-Ask as Sam, with one memory and no scoping — the thing everyone builds first:
+## What Shelf Life does
 
-> **"Am I going to be made permanent?"**
-> *"Leadership has already decided to extend Sam as a contractor through Q4 and only revisit a
-> permanent conversion after the Meridian deal closes (`#leadership-private`, 2026-06-02)."*
+Every answer comes back with four things instead of one:
 
-A contractor asked about his own future and was shown the room he was not in.
+| | |
+|---|---|
+| **What the docs say** | Authoritative, versioned, dated — and sometimes wrong |
+| **What the team found** | The conclusion of the thread, not the first reply |
+| **How much to trust it** | `current` · `stale` · `unproven` · `superseded` |
+| **Who to ask** | The person who actually worked it out, and when |
 
-Ask the same question through Clearance:
+### The trust verdict is computed, not guessed
 
-> `#general` — *"I have no record that says Sam will be made a permanent employee."*
-> `#eng` — *"The only relevant exchange is Sam asking Tom, and Tom saying nothing he can commit to."*
+Three things can undermine an answer, and they are **not** the same thing:
 
-Then ask **"How do we deploy?"** and Sam gets the complete process, quoted from `#eng` — proof
-this scopes rather than stonewalls. Then ask as **Ana**, and `#leadership-private` gives her the
-real reason, because she is allowed it.
+- **superseded** — someone explicitly overturned it later
+- **unproven** — the author hedged, on the record
+- **stale** — nobody has touched it in months
 
-## How it works
+Asking a model "is this trustworthy?" produces a vibe. Shelf Life reads the metadata off
+the actual messages behind the answer, so the verdict is deterministic and you can point at
+the message that caused it.
 
-Cognee's permission boundary is the **dataset**, and it works. The problem is what it costs:
+## Why both Cognee and Qdrant
 
-| | Unauthorised asker | Authorised asker |
-|---|---|---|
-| Everything in one memory | **Leaks** | Great answers |
-| One dataset per channel | Correctly refuses | **Answers fall apart too** |
+Each does something the other can't:
 
-*Useful or safe, pick one.* Clearance is the third option:
+- **Cognee** reads a whole *thread* and distils the answer. The real answer to
+  "why won't my SFTP connector authenticate" does not exist in any single message — it's
+  spread across a symptom, a wrong guess, a diagnosis and two fixes. Cognee is also asked
+  the docs and the channel **separately**, so their disagreement is visible instead of
+  blended away.
+- **Qdrant** finds *which messages* back that answer, with `date`, `author`, `unproven`
+  and `supersedes` in the payload. That's the evidence the verdict is computed from.
 
-> **Work out who is asking → query only the channels they are cleared for, one at a time →
-> return one answer card per channel.**
+Cognee gives the answer. Qdrant gives you what you need to judge it.
 
-**You cannot leak a channel you never queried.** Permission stops being a filter applied to
-results and becomes a property of which questions get asked at all. Answers also get *better*,
-because each query is focused rather than spread across datasets.
+## The four demo questions
 
-### Two things we measured rather than assumed
+Real cases, from real hard-won knowledge about a real product:
 
-- **`node_set` scoping fails open.** A search scoped to `#eng` returned the private message
-  verbatim in its evidence. It is a relevance filter, never documented as a security boundary —
-  but it is what you reach for, and it fails open rather than closed.
-- **Derived facts carry no channel.** Cognee builds summary nodes from what it reads. One read
-  *"a private leadership chat where Tom advises delaying hiring until the Meridian deal closes"*
-  — tagged `[tom, hiring, deal]`, **with no channel marker at all.** Raw messages carry
-  `[#channel]` so a text filter catches them. That one it cannot catch.
+| Question | Docs | Channel | Verdict |
+|---|---|---|---|
+| SFTP connector won't connect, credentials are correct | **Confidently wrong** — blames a feature flag and permissions | It's SHA-1: the connector signs RSA keys with legacy `ssh-rsa`, which OpenSSH 8.8+ rejects | `current` |
+| How do I push callback completion status out? | **Silent** — there is no such endpoint | Post Call Workflow → External REST API connector, plus six gotchas | `current` |
+| How do I authenticate to the platform API? | Silent | 2025 said `client_credentials`; **overturned 2026-07-02** — now auth-code flow | **`superseded`** |
+| Dialer isn't calling, segment says Data Exhausted | Silent | First answer **flagged unproven by its own author**, then contradicted — it was an environment-level scheduler bug | **`superseded` + `unproven`** |
 
-### Identity
-
-Two front doors, one memory. The web UI has an "asking as" switch. The voice line uses
-**caller ID as the identity** — no login. An unknown number is an outsider by construction and
-gets nothing, which is what makes it safe to hand a stranger the number.
-
-## Stack
-
-- **Cognee Cloud** — the graph, the reasoning, the per-channel datasets that form the boundary
-- **Qdrant** — all messages in one collection with `channel` in the payload. The naive baseline
-  queries it unfiltered; the scoped path adds a single `Filter`. Same collection, same query,
-  same embedding, one line apart. Embeddings run locally via FastEmbed.
-- **FastAPI** — fan-out, cards, and the voice webhook
+The last one is the point of the whole project. A similarity search hands you a colleague's
+guess as though it were fact. Shelf Life says *"treat as a guess — the author said so
+themselves"* and shows you the message where he retracted it.
 
 ## Run it
 
@@ -89,20 +84,29 @@ gets nothing, which is what makes it safe to hand a stranger the number.
 python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
 export COGNEE_CLOUD_URL=... COGNEE_CLOUD_API_KEY=... QDRANT_URL=http://127.0.0.1:6333
 
-python3 tools/build_corpus.py corpus/export   # regenerate the Slack export
-python3 tools/ingest_cognee.py                # per-channel datasets + shared baseline
-python3 tools/load_qdrant.py                  # load Qdrant, then show the one-line leak demo
-
+python3 tools/build_shelflife_corpus.py corpus    # docs + channel
+python3 tools/ingest_shelflife.py corpus          # two cognee datasets + qdrant
 cd app && uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 ## The corpus
 
-Synthetic, in the real Slack export layout (`users.json`, `channels.json`, **`groups.json`** for
-private channels, `<channel>/YYYY-MM-DD.json`). Generated rather than exported: no real workspace
-data, a demo that is identical every run, and the chains the story needs are planted rather than
-hoped for. Ingesting it is genuinely ingesting a Slack export — the format is the interface.
+Two sources, deliberately in conflict.
 
-`tools/validate_corpus.py` is a gate, not a demo: it asserts that the naive path leaks, that the
-scoped path does not, that the control question is answered from the corpus rather than general
-knowledge, and that **the authorised user still gets the real answer**.
+**`docs/`** — official product documentation, carrying its real version number and last-updated
+date. Ingested from a local Confluence export when present; the repo ships **paraphrased
+stubs**, because vendor documentation is not ours to redistribute.
+
+**`channel/`** — a 32-message engineering channel across 14 months, with 7 threads, **2 answers
+flagged unproven by their own authors, and 2 supersessions**. Written from real incidents:
+the SHA-1 SFTP failure, the missing callback-status API, the VoiceConnect ACL that doesn't
+resolve hostnames.
+
+Synthetic, so it can be published — but every gotcha in it cost somebody a real day.
+
+## It's Slack-shaped, not Slack-only
+
+The channel format is a thin adapter. The problem this solves is worst in exactly the places
+that aren't Slack: Microsoft Teams channels nobody reads, where the same question gets asked
+a year apart and answered from scratch every time. Swapping the ingest adapter is the only
+change needed.

@@ -1,0 +1,24 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-02",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "oauth2",
+    "unproven": false,
+    "supersedes": "oauth",
+    "text": "Heads up - client_credentials is not enabled any more, you get 'Default Admin User Not Setup'. Use the auth-code flow instead: browser, logged in, hit /oauth/authorize with client_id and redirect_uri, submit, pick the client, submit, then exchange the code at /oauth/token. Headers on calls are Authorization: Bearer <token> plus Key: <client_id>."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-02",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "oauth2",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Ah - that's why my script broke last week. I assumed I'd broken it myself and rewrote the whole thing."
+  }
+]

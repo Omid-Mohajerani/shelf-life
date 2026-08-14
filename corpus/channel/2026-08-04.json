@@ -1,0 +1,13 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-08-04",
+    "author": "Marek Nowak",
+    "author_title": "Platform Engineer",
+    "thread": "exhausted2",
+    "unproven": false,
+    "supersedes": "exhausted",
+    "text": "Update on the Data Exhausted thing: it was not the segment. The segment went Active on its own and still scheduled zero calls, and brand new campaigns in the same tenant failed identically. It's an environment-level scheduler problem, escalated to Sprinklr support. So please don't go rebuilding segments on my earlier guess - treat Data Exhausted as a thing to clear, not as an explanation."
+  }
+]

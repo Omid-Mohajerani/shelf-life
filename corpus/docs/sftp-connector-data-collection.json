@@ -1,0 +1,8 @@
+{
+  "source": "docs",
+  "title": "SFTP Connector: Data Collection",
+  "version": 3,
+  "updated": "2025-11-04",
+  "created": "2025-11-04",
+  "text": "Configure an SFTP connector to import records on a schedule.\n\nRequired settings: host, port (default 22), username, authentication method,\nand remote directory. Both password and RSA key authentication are supported.\nUpload the private key in the Destination Specific Settings panel.\n\nIf the connector cannot reach the server, verify the connection details are\ncorrect and that the host is reachable from Sprinklr's egress addresses.\nCommon causes are an incorrect username, an incorrect directory path, or a\nfirewall blocking the connection."
+}

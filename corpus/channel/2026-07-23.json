@@ -1,0 +1,35 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-23",
+    "author": "Marek Nowak",
+    "author_title": "Platform Engineer",
+    "thread": "exhausted",
+    "unproven": true,
+    "supersedes": null,
+    "text": "Best guess: Data Exhausted is sticky - updating the leads doesn't reopen a segment that already finished its pass. Probably need a fresh segment on the same filter rather than another upload."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-23",
+    "author": "Marek Nowak",
+    "author_title": "Platform Engineer",
+    "thread": "exhausted",
+    "unproven": true,
+    "supersedes": null,
+    "text": "Flagging that as a guess, not a finding. I haven't proven it."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-23",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "exhausted",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Rechurn is not the lever either - its job is overriding attempt limits for leads that HAVE been attempted. With Attempted Records 0 there's no limit to override."
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "source": "docs",
+  "title": "Different Types of Segments",
+  "version": 2,
+  "updated": "2025-09-30",
+  "created": "2025-09-30",
+  "text": "A segment defines the set of records a campaign will dial. Segment states\ninclude Active, Paused, and Data Exhausted.\n\nData Exhausted indicates the segment has dialed all callable records under its\ncurrent filter. Review the segment filter and the Estimated Reach if the\nsegment is not producing calls."
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-07-22",
+    "author": "Marek Nowak",
+    "author_title": "Platform Engineer",
+    "thread": "exhausted",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Dialer isn't calling on the Northwind UAT tenant. Segment says Data Exhausted but Number of Callable Records is non-zero and Attempted Records is 0."
+  }
+]

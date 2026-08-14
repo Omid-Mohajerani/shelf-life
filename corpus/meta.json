@@ -1,0 +1,46 @@
+{
+  "people": {
+    "nadia": {
+      "name": "Nadia Farsi",
+      "title": "Senior Voice Engineer"
+    },
+    "jonas": {
+      "name": "Jonas Weber",
+      "title": "Integration Engineer"
+    },
+    "marek": {
+      "name": "Marek Nowak",
+      "title": "Platform Engineer"
+    },
+    "priya": {
+      "name": "Priya Raman",
+      "title": "Delivery Lead"
+    },
+    "sam": {
+      "name": "Sam Beck",
+      "title": "New joiner, Voice"
+    }
+  },
+  "sources": [
+    "docs",
+    "channel"
+  ],
+  "demo_questions": [
+    {
+      "question": "Our SFTP export connector won't connect but the credentials are correct.",
+      "expected": "Docs say 'verify connection details' and are MISLEADING. The channel has the real cause (SHA-1 vs OpenSSH 8.8+) and two fixes. Answer must prefer the channel and say the docs are wrong here."
+    },
+    {
+      "question": "How do I get callback completion status out to an external system?",
+      "expected": "Docs have NOTHING - there is no such endpoint. Only the channel has the recipe. Answer must say the docs do not cover this."
+    },
+    {
+      "question": "How do I authenticate to the platform API?",
+      "expected": "Two answers on record. The 2025 one (client_credentials) is SUPERSEDED by the 2026-07-02 one (auth-code). Answer must give the current one and say what changed."
+    },
+    {
+      "question": "The dialer isn't calling and the segment says Data Exhausted.",
+      "expected": "The channel's first answer was flagged UNPROVEN by its own author and later contradicted. Answer must NOT present the guess as fact."
+    }
+  ]
+}

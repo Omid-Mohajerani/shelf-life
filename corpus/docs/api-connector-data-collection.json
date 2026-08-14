@@ -1,0 +1,8 @@
+{
+  "source": "docs",
+  "title": "API Connector: Data Collection",
+  "version": 3,
+  "updated": "2026-02-20",
+  "created": "2026-02-20",
+  "text": "API connectors let Sprinklr collect records from an external HTTP endpoint on a\nschedule. Configure the endpoint, authentication, and a response mapping.\n\nFor outbound calls from a journey, register the destination under\nAll Settings -> APIs and Integrations."
+}

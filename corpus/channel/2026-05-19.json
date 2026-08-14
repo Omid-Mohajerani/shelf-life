@@ -1,0 +1,24 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-19",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "SFTP export connector won't connect on the acc server. Sprinklr just says there's an issue with the connection details. Host, port, user, directory and key are all correct - I've triple checked and I can sftp in myself from my laptop with the same key."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-19",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Docs just say verify the connection details and check the firewall. Firewall is open, I can see the connection arrive."
+  }
+]

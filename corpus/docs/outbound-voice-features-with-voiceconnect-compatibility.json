@@ -1,0 +1,8 @@
+{
+  "source": "docs",
+  "title": "Outbound Voice Features with VoiceConnect Compatibility",
+  "version": 5,
+  "updated": "2026-03-11",
+  "created": "2026-03-11",
+  "text": "VoiceConnect supports bring-your-own-carrier deployments. Inbound traffic is\nauthenticated using an IP Access Control List and, optionally, a Credential\nList.\n\nIP Address - public IPv4 address of your SBC or VoIP server.\nRange - use 32 for a single IP address."
+}

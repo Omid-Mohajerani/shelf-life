@@ -1,0 +1,8 @@
+{
+  "source": "docs",
+  "title": "Callback Manager",
+  "version": 4,
+  "updated": "2026-01-15",
+  "created": "2026-01-15",
+  "text": "Callback Manager provides a view of scheduled callbacks across campaigns.\nCallbacks may be Agent-First or Customer-First. Use the Scheduled Callbacks\nReport to review outcomes.\n\nCallbacks are created against a campaign running a Callback dialer profile.\nThe Schedule Callback action returns a task identifier."
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-06-24",
+    "author": "Marek Nowak",
+    "author_title": "Platform Engineer",
+    "thread": "callback",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Is there a GET callback-status API? I need callback completion out to our system and I can't find an endpoint."
+  }
+]

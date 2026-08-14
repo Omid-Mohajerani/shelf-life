@@ -1,0 +1,79 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-20",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "This is not a credentials problem. Check /var/log/auth.log - I bet you see 'Disconnected ... [preauth]' mid-authentication."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-20",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Yes! Exactly that. What is it?"
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-20",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Sprinklr's SFTP connector uses an old SSH client that signs RSA keys with the legacy ssh-rsa signature, which is SHA-1. OpenSSH 8.8 and later disabled SHA-1 RSA signatures by default and only accept rsa-sha2-256 or rsa-sha2-512. The server rejects the signature type and drops the connection. The UI surfaces that as a generic connection error, which is why it looks like bad credentials."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-20",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Quick fix for test, scoped to the sftp group only:\nMatch Group sftpusers\n    PubkeyAcceptedAlgorithms +ssh-rsa\nthen systemctl reload sshd. The rest of the box keeps modern defaults."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-20",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "For production do it the other way round - use an ed25519 or ECDSA key for the destination and avoid SHA-1 entirely. Only re-enable ssh-rsa server-side, narrowly scoped, if you have no choice."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-20",
+    "author": "Priya Raman",
+    "author_title": "Delivery Lead",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Can we get this into the docs? It cost Jonas two days."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-05-20",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "sftp",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Raised it. Not holding my breath."
+  }
+]

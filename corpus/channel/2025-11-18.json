@@ -1,0 +1,13 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2025-11-18",
+    "author": "Priya Raman",
+    "author_title": "Delivery Lead",
+    "thread": null,
+    "unproven": false,
+    "supersedes": null,
+    "text": "Reminder that the official docs are the source of truth for customer-facing statements. If something in here contradicts them, raise it."
+  }
+]

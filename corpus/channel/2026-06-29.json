@@ -1,0 +1,35 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-06-29",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "callback",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Proven on prod-2 today. Campaign Post Call Workflow journey -> External REST API connector -> your authenticated webhook. Correlation works: Schedule Callback returns a taskId and it comes back on the call as VOICE_CONVERSATION.SCHEDULED_CALLBACK_TASK_ID, so the push can carry it and the receiver matches it up."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-06-29",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "callback",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Gotchas, each of which cost me real time:\n- Register an External REST API first (All Settings -> APIs and Integrations). The journey API node has no inline URL, only a connector dropdown.\n- Map values with the resource PICKER, not raw VOICE_CONVERSATION.x in custom code. In Post Call Workflow context only PROFILE is populated, so raw Groovy returns null.\n- The OpenAPI spec on a connector is read-only after creation. To rename a body field you recreate the connector.\n- Callbacks only exist on a Callback dialer profile. Preview dials have no callback task, so callbackTaskId comes back empty."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2026-06-29",
+    "author": "Marek Nowak",
+    "author_title": "Platform Engineer",
+    "thread": "callback",
+    "unproven": false,
+    "supersedes": null,
+    "text": "This should be a docs page on its own."
+  }
+]

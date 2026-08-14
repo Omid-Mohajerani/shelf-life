@@ -1,0 +1,35 @@
+[
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2025-06-12",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "oauth",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Anyone got the OAuth flow for the platform APIs working? I want to script the token."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2025-06-12",
+    "author": "Nadia Farsi",
+    "author_title": "Senior Voice Engineer",
+    "thread": "oauth",
+    "unproven": false,
+    "supersedes": null,
+    "text": "client_credentials works. Register the app, grab client id and secret, POST to /oauth/token with grant_type=client_credentials. Token lasts about a month."
+  },
+  {
+    "source": "channel",
+    "channel": "voice-eng",
+    "date": "2025-06-12",
+    "author": "Jonas Weber",
+    "author_title": "Integration Engineer",
+    "thread": "oauth",
+    "unproven": false,
+    "supersedes": null,
+    "text": "Perfect, that worked. Thanks."
+  }
+]
