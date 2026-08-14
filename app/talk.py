@@ -1,14 +1,13 @@
 """Talk to it. A second front door onto the same memory.
 
-Deliberately its own page and its own route - the web demo does not import any
-of this, so if the voice leg misbehaves it cannot take the working demo with it.
+Its own page and its own route - the web demo imports none of this, so if the
+voice leg misbehaves it cannot take the working demo down with it.
 
 Browser call rather than a phone number: no DID, no SBC, no DNS, and anyone in
 the room can try it from their own laptop.
 
-The visualiser is driven by real audio, not a loop: an AnalyserNode on the
-microphone while you talk, and VAPI's volume-level events while it talks. On a
-stage that difference reads instantly - the bars move when YOU move.
+The orb is driven by real audio - an AnalyserNode on the microphone while you
+talk, VAPI volume-level events while it talks. It moves because you moved.
 """
 
 TALK = """<!doctype html><html><head><meta charset=utf-8>
@@ -16,66 +15,93 @@ TALK = """<!doctype html><html><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <style>
 *{box-sizing:border-box}
-:root{--bg:#f6f8fa;--panel:#fff;--line:#d8dee4;--dim:#57606a;--fg:#1f2328;
- --grn:#1a7f37;--red:#cf222e;--blu:#0969da;--vio:#8250df}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);
- font:16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:800px;margin:0 auto;padding:40px 24px 60px}
-h1{font-size:32px;margin:0;letter-spacing:-.03em}
-h1 em{font-style:normal;color:var(--dim);font-weight:400;font-size:18px}
-.sub{color:var(--dim);margin:10px 0 28px}
+:root{--vio:#8b5cf6;--pink:#ec4899;--teal:#14b8a6;--dim:#8b93a7}
+html,body{margin:0;min-height:100%;background:#07070d;color:#eef1f8;
+ font:16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+ overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;border-radius:50%;
+ filter:blur(120px);pointer-events:none;z-index:0}
+body:before{width:60vw;height:60vw;top:-22vw;left:-16vw;
+ background:radial-gradient(circle,rgba(99,70,220,.42),transparent 65%)}
+body:after{width:62vw;height:62vw;bottom:-26vw;right:-16vw;
+ background:radial-gradient(circle,rgba(20,184,166,.26),transparent 62%)}
+.glow3{position:fixed;width:46vw;height:46vw;bottom:-20vw;left:16vw;
+ filter:blur(130px);border-radius:50%;z-index:0;pointer-events:none;
+ background:radial-gradient(circle,rgba(236,72,153,.24),transparent 62%)}
 
-.stage{background:var(--panel);border:1px solid var(--line);border-radius:20px;
- padding:38px 30px 30px;text-align:center;box-shadow:0 1px 3px rgba(31,35,40,.06);
- transition:border-color .4s,box-shadow .4s}
-.stage.you{border-color:#7fc4ff;box-shadow:0 0 0 4px rgba(9,105,218,.09)}
-.stage.bot{border-color:#7ee2a0;box-shadow:0 0 0 4px rgba(26,127,55,.10)}
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;
+ padding:8vh 24px 60px;text-align:center;min-height:100vh;
+ display:flex;flex-direction:column;align-items:center}
 
-/* the visualiser */
-.viz{height:120px;display:flex;align-items:center;justify-content:center;gap:5px;
- margin-bottom:8px}
-.bar{width:7px;height:8px;border-radius:4px;background:#c9d3de;
- transition:background .35s}
-.stage.you .bar{background:var(--blu)}
-.stage.bot .bar{background:var(--grn)}
+/* the orb */
+.orbwrap{position:relative;width:200px;height:200px;display:grid;place-items:center;
+ margin-bottom:26px}
+.ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.10)}
+.pulse{position:absolute;inset:14px;border-radius:50%;
+ border:1px solid rgba(139,92,246,.5);opacity:0;pointer-events:none}
+.live .pulse{animation:ripple 2.4s ease-out infinite}
+.live .pulse:nth-of-type(2){animation-delay:.8s}
+.live .pulse:nth-of-type(3){animation-delay:1.6s}
+@keyframes ripple{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.6);opacity:0}}
+.orb{width:108px;height:108px;border-radius:50%;display:grid;place-items:center;
+ background:linear-gradient(140deg,var(--vio),var(--pink));
+ box-shadow:0 0 46px rgba(139,92,246,.55);transition:box-shadow .25s,background .5s;
+ will-change:transform}
+.bot .orb{background:linear-gradient(140deg,#10b981,var(--teal));
+ box-shadow:0 0 52px rgba(20,184,166,.6)}
+.think .orb{background:linear-gradient(140deg,#6366f1,#8b5cf6)}
+.orb svg{width:42px;height:42px;fill:#fff;opacity:.96}
 
-.label{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
- color:var(--dim);min-height:20px;transition:color .3s}
-.stage.you .label{color:var(--blu)}
-.stage.bot .label{color:var(--grn)}
-.state{margin:8px 0 24px;color:var(--dim);font-size:15px;min-height:24px}
+h1{font-size:40px;margin:0;letter-spacing:-.035em;font-weight:700}
+.kicker{color:#a78bfa;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;
+ font-weight:700;margin:9px 0 16px}
+.bot .kicker{color:#5eead4}
+.tag{color:var(--dim);font-size:17px;margin:0 0 30px;max-width:520px;line-height:1.55}
+.tag b{color:#eef1f8;font-weight:600}
 
-button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:17px 42px;
- font-size:17px;font-weight:600;color:#fff;background:#1f883d;transition:.15s}
-button:hover{background:#1a7f37;transform:translateY(-1px)}
-button.on{background:var(--red)}
-button:disabled{background:#8c959f;cursor:default;transform:none}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:17px 46px;
+ font-size:17px;font-weight:600;color:#fff;letter-spacing:.01em;
+ background:linear-gradient(100deg,var(--vio),var(--pink));
+ box-shadow:0 8px 30px rgba(139,92,246,.4);transition:.18s}
+button:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(139,92,246,.55)}
+button.on{background:linear-gradient(100deg,#f43f5e,#ef4444);
+ box-shadow:0 8px 30px rgba(244,63,94,.4)}
+button:disabled{background:#2a2a3a;box-shadow:none;cursor:default;transform:none}
+.note{color:#6b7280;font-size:13.5px;margin-top:13px;min-height:20px}
 
-.hint{margin-top:26px;color:var(--dim);font-size:14.5px;text-align:left}
-.hint b{color:var(--fg)}
-.hint ul{margin:9px 0 0;padding-left:20px}
-.hint li{margin:6px 0;cursor:default}
-.log{margin-top:24px;text-align:left;font-size:15px}
-.line{padding:11px 15px;border-radius:12px;margin-bottom:8px;background:#f0f2f5;
+.hint{margin-top:38px;color:var(--dim);font-size:14.5px;text-align:left;
+ max-width:560px;background:rgba(255,255,255,.032);
+ border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:18px 22px}
+.hint b{color:#eef1f8}
+.hint ul{margin:9px 0 0;padding-left:19px}
+.hint li{margin:6px 0}
+.log{margin-top:26px;text-align:left;max-width:640px;width:100%;font-size:15px}
+.line{padding:12px 16px;border-radius:14px;margin-bottom:9px;
+ background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);
  animation:in .3s ease}
-@keyframes in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.line.you{background:#ddeeff}
-.line b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;
- color:var(--dim);margin-bottom:2px}
-a{color:var(--blu);text-decoration:none}
-.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);
- color:var(--dim);font-size:14px}
-</style></head><body><div class=wrap>
-<h1>Shelf Life <em>— talk to it</em></h1>
-<p class=sub>The same memory, asked out loud. When an answer has been overturned,
- it says so <b>before</b> it answers.</p>
+.line.you{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.3)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.line b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;
+ color:var(--dim);margin-bottom:3px}
+a{color:#a78bfa;text-decoration:none}
+.foot{margin-top:40px;color:#6b7280;font-size:13.5px}
+</style></head><body>
+<div class=glow3></div>
+<div class=wrap id=wrap>
 
-<div class=stage id=stage>
- <div class=viz id=viz></div>
- <div class=label id=label>ready</div>
- <div class=state id=state>Click below and allow the microphone. Nothing is recorded.</div>
- <button id=btn onclick=toggle()>Start talking</button>
+<div class=orbwrap id=orbwrap>
+ <div class=ring></div>
+ <div class=pulse></div><div class=pulse></div><div class=pulse></div>
+ <div class=orb id=orb><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V21h-2a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.08A7 7 0 0 0 19 11z"/></svg></div>
 </div>
+
+<h1>Shelf Life</h1>
+<div class=kicker id=kicker>workspace memory</div>
+<p class=tag>Ask it anything about the team's channel. When an answer has been
+ overturned, <b>it tells you before it answers.</b></p>
+
+<button id=btn onclick=toggle()>Talk to it</button>
+<div class=note id=note>Works in your browser — no app needed</div>
 
 <div class=hint><b>Try asking:</b>
  <ul>
@@ -83,39 +109,36 @@ a{color:var(--blu);text-decoration:none}
   <li>&ldquo;Why won't our SFTP export connector connect? The credentials are correct.&rdquo;</li>
   <li>&ldquo;What does this team know that the docs don't?&rdquo;</li>
  </ul>
- Give it a few seconds &mdash; it reads whole threads, not chunks.
 </div>
 
 <div class=log id=log></div>
-<div class=foot><a href="/">&larr; the web version</a> &middot;
- <a href="/chat">#voice-eng</a></div>
+<div class=foot><a href="/">the web version</a> &middot; <a href="/chat">#voice-eng</a></div>
 </div>
 
 <script type="module">
 import Vapi from "https://esm.sh/@vapi-ai/web@2.3.8";
 const KEY="__KEY__", ASSISTANT="__ASSISTANT__";
-const btn=document.getElementById('btn'), st=document.getElementById('state');
-const stage=document.getElementById('stage'), label=document.getElementById('label');
-const viz=document.getElementById('viz'), log=document.getElementById('log');
+const btn=document.getElementById('btn'), note=document.getElementById('note');
+const wrap=document.getElementById('wrap'), orb=document.getElementById('orb');
+const orbwrap=document.getElementById('orbwrap');
+const kicker=document.getElementById('kicker'), log=document.getElementById('log');
 
-const N=28, bars=[];
-for(let i=0;i<N;i++){const b=document.createElement('div');b.className='bar';
- viz.appendChild(b);bars.push(b);}
+let vapi=null, live=false, mode='idle', thinkUntil=0;
+let audioCtx=null, analyser=null, data=null, stream=null, raf=null, botLevel=0, smooth=0;
 
-let vapi=null, live=false, mode='idle';
-let audioCtx=null, analyser=null, data=null, stream=null, raf=null, botLevel=0;
+if(!KEY||!ASSISTANT){btn.disabled=true;note.textContent='Voice is not configured on this server.';}
 
-if(!KEY||!ASSISTANT){btn.disabled=true;st.textContent='Voice is not configured on this server.';}
+const LABEL={idle:'workspace memory',connecting:'connecting',listen:'listening',
+ you:'you are speaking',bot:'shelf life is speaking',think:'reading the channel'};
 
 function setMode(m,text){
- mode=m; stage.className='stage'+(m==='you'?' you':m==='bot'?' bot':'');
- label.textContent={idle:'ready',connecting:'connecting',listen:'listening',
-   you:'you are speaking',bot:'shelf life is speaking',think:'querying qdrant and cognee'}[m]||m;
- if(text!==undefined) st.textContent=text;
+ if(m===mode && text===undefined) return;
+ mode=m;
+ wrap.className='wrap'+(m==='bot'?' bot':m==='think'?' think':'');
+ orbwrap.className='orbwrap'+(live?' live':'');
+ kicker.textContent=LABEL[m]||m;
+ if(text!==undefined) note.textContent=text;
 }
-
-// A bell curve so the middle bars are tallest - reads as a voice, not a graph.
-const shape=i=>{const x=(i-(N-1)/2)/((N-1)/2);return 1-0.72*x*x;};
 
 function draw(){
  raf=requestAnimationFrame(draw);
@@ -123,20 +146,23 @@ function draw(){
  if(analyser){
   analyser.getByteTimeDomainData(data);
   let sum=0; for(let i=0;i<data.length;i++){const v=(data[i]-128)/128;sum+=v*v;}
-  mic=Math.sqrt(sum/data.length);          // RMS
+  mic=Math.sqrt(sum/data.length);
  }
- const speakingBot = botLevel>0.02;
- const amp = speakingBot ? botLevel*1.5 : mic*3.2;
- if(live && mode!=='think'){
-  if(speakingBot) { if(mode!=='bot') setMode('bot'); }
-  else if(mic>0.045){ if(mode!=='you') setMode('you'); }
-  else if(mode!=='listen') setMode('listen');
+ const speakingBot=botLevel>0.02;
+ // 'think' is a hint while the tool call is out - it expires, and the assistant
+ // speaking cancels it immediately. Otherwise the orb freezes mid-call.
+ const thinking = Date.now()<thinkUntil && !speakingBot;
+ if(live){
+  if(thinking) setMode('think');
+  else if(speakingBot) setMode('bot');
+  else if(mic>0.045) setMode('you');
+  else setMode('listen');
  }
- for(let i=0;i<N;i++){
-  const jitter=0.55+0.45*Math.sin(Date.now()/((speakingBot?90:150)+i*11)+i);
-  const h = live ? 8+Math.min(1,amp)*92*shape(i)*jitter : 8;
-  bars[i].style.height=h.toFixed(1)+'px';
- }
+ const target = live ? Math.min(1,(speakingBot?botLevel*1.6:mic*3.4)) : 0;
+ smooth += (target-smooth)*0.22;
+ orb.style.transform='scale('+(1+smooth*0.30).toFixed(3)+')';
+ const c = mode==='bot' ? '20,184,166' : '139,92,246';
+ orb.style.boxShadow='0 0 '+(44+smooth*70).toFixed(0)+'px rgba('+c+','+(0.5+smooth*0.45).toFixed(2)+')';
 }
 
 async function startMic(){
@@ -145,9 +171,8 @@ async function startMic(){
   audioCtx=new (window.AudioContext||window.webkitAudioContext)();
   const src=audioCtx.createMediaStreamSource(stream);
   analyser=audioCtx.createAnalyser(); analyser.fftSize=1024;
-  data=new Uint8Array(analyser.fftSize);
-  src.connect(analyser);
- }catch(e){ /* the call still works; only the bars go quiet */ }
+  data=new Uint8Array(analyser.fftSize); src.connect(analyser);
+ }catch(e){ /* the call still works; only the orb goes still */ }
 }
 function stopMic(){
  if(stream) stream.getTracks().forEach(t=>t.stop());
@@ -166,23 +191,23 @@ window.toggle=async function(){
  if(live){ vapi.stop(); return; }
  if(!vapi){
   vapi=new Vapi(KEY);
-  vapi.on('call-start',async()=>{live=true;btn.textContent='Stop';btn.className='on';
+  vapi.on('call-start',async()=>{live=true;btn.textContent='End call';btn.className='on';
     await startMic(); setMode('listen','Just talk — it is listening.');});
-  vapi.on('call-end',()=>{live=false;btn.textContent='Start talking';btn.className='';
-    stopMic(); botLevel=0; setMode('idle','Call ended.');});
+  vapi.on('call-end',()=>{live=false;btn.textContent='Talk to it';btn.className='';
+    stopMic(); botLevel=0; setMode('idle','Works in your browser — no app needed');});
   vapi.on('volume-level',v=>{botLevel=v||0;});
-  vapi.on('speech-start',()=>{botLevel=Math.max(botLevel,0.15);});
+  vapi.on('speech-start',()=>{thinkUntil=0;botLevel=Math.max(botLevel,0.15);});
   vapi.on('speech-end',()=>{botLevel=0;});
   vapi.on('message',m=>{
     if(m.type==='transcript'&&m.transcriptType==='final')
       say(m.role==='user'?'you':'shelf life',m.transcript,m.role==='user');
-    if(m.type==='tool-calls') setMode('think','Reading the docs and the channel…');
+    if(m.type==='tool-calls'){thinkUntil=Date.now()+45000;
+      setMode('think','Querying Qdrant and cognee…');}
   });
-  vapi.on('error',e=>{live=false;stopMic();btn.textContent='Start talking';
-    btn.className='';setMode('idle','Error: '+((e&&e.message)||'call failed'));});
+  vapi.on('error',e=>{live=false;stopMic();btn.textContent='Talk to it';btn.className='';
+    setMode('idle','Error: '+((e&&e.message)||'call failed'));});
  }
  setMode('connecting','Connecting…');
- if(!raf) draw();
  try{ await vapi.start(ASSISTANT); }
  catch(e){ setMode('idle','Could not start: '+e.message); }
 }
