@@ -8,7 +8,7 @@
     "thread": "acl",
     "unproven": false,
     "supersedes": null,
-    "text": "Meridian VoiceConnect trunk: outbound is fine, inbound never arrives. No error anywhere. Trunk looks half alive."
+    "text": "The Meridian VoiceConnect trunk: outbound is fine, inbound never arrives. No error anywhere. Trunk looks half alive."
   },
   {
     "source": "channel",

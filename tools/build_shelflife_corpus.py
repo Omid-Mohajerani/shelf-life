@@ -190,7 +190,7 @@ CHANNEL = [
      "exhausted2", "supersedes:exhausted"),
 
     # ---- 2026-07-31: silent failure the docs describe but nobody reads -----
-    ("2026-07-31", "jonas", "Meridian VoiceConnect trunk: outbound is fine, inbound "
+    ("2026-07-31", "jonas", "The Meridian VoiceConnect trunk: outbound is fine, inbound "
      "never arrives. No error anywhere. Trunk looks half alive.", "acl"),
     ("2026-07-31", "omid", "What's in the IP Access Control List?", "acl"),
     ("2026-07-31", "jonas", "The AudioCodes hostname - "
