@@ -8,6 +8,7 @@ import os
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
+from live import inject, reset, state
 from shelflife import answer
 
 app = FastAPI(title="Shelf Life")
@@ -77,6 +78,12 @@ button:hover{border-color:#58a6ff}
 .flag{color:#e3b341;font-size:12.5px;margin-top:5px}
 .flag.s{color:#ff9b95}
 .muted{color:#7d8590;padding:30px 0}
+.trace{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.13);
+ font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;opacity:.75}
+.foot{margin-top:34px;display:flex;align-items:center;gap:18px;color:#7d8590;
+ border-top:1px solid #21262d;padding-top:20px}
+.foot img{width:96px;height:96px;background:#fff;padding:6px;border-radius:8px}
+.foot b{color:#e6edf3;font-size:17px}
 </style></head><body><div class=wrap>
 <h1>Shelf Life <span>&mdash; every answer in a company has one</span></h1>
 <p class=tag>What the docs say &middot; what the team found &middot; how much to trust it &middot; who to ask</p>
@@ -89,6 +96,8 @@ button:hover{border-color:#58a6ff}
 <div class=presets>__PRESETS__<label style="color:#7d8590;font-size:12.5px;margin-left:auto;align-self:center">
  <input type=checkbox id=off style="width:auto;vertical-align:middle"> offline</label></div>
 <div id=out class=muted>Ask something.</div>
+<div class=foot>__QR__<div><b>shelflife.ringamo.dev</b><br>
+Try it from your seat &mdash; it is live now.</div></div>
 </div><script>
 function preset(t){q.value=t;go()}
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
@@ -100,7 +109,8 @@ async function go(){
  const t=d.trust;
  let h='<div class="verdict '+t.level+'"><div class=lvl>'+esc(t.level)+'</div>'+
    esc(t.headline)+(d.cached?' <span style="opacity:.6;font-size:13px">(cached)</span>':'')+
-   (t.signals.length?'<div class=sig>'+t.signals.map(esc).join('<br>')+'</div>':'')+'</div>';
+   (t.signals.length?'<div class=sig>'+t.signals.map(esc).join('<br>')+'</div>':'')+
+   (t.trace?'<div class=trace>'+esc(t.trace)+'</div>':'')+'</div>';
  h+='<div class=cols>'+
   '<div class="card docs'+(d.docs.silent?' silent':'')+'"><h3>Official documentation</h3>'+
    '<div class=sub>'+(d.docs.silent?'does not cover this':'authoritative, versioned')+'</div>'+
@@ -127,12 +137,29 @@ async function go(){
 </script></body></html>"""
 
 
+def _qr() -> str:
+    """QR for the live URL, inlined as a data URI - no external asset, because a
+    demo page that fetches from the internet is a demo that can fail."""
+    try:
+        import base64
+        import io
+
+        import segno
+        buf = io.BytesIO()
+        segno.make("https://shelflife.ringamo.dev", error="m").save(
+            buf, kind="png", scale=6, border=1)
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        return f'<img src="data:image/png;base64,{b64}" alt="QR">'
+    except Exception:
+        return ""
+
+
 def render() -> str:
     presets = "".join(
         f"""<button onclick="preset('{q.replace("'", "\\'")}')">{label}</button>"""
         for label, q in PRESETS
     )
-    return PAGE.replace("__PRESETS__", presets)
+    return PAGE.replace("__PRESETS__", presets).replace("__QR__", _qr())
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -170,6 +197,54 @@ async def ask(req: Request) -> JSONResponse:
         if question in cache:
             return JSONResponse({**cache[question], "cached": True})
         raise
+
+
+@app.post("/inject")
+async def inject_msg() -> JSONResponse:
+    """Post the new message. Same collection the verdict is computed from."""
+    return JSONResponse(inject())
+
+
+@app.post("/reset")
+async def reset_msg() -> JSONResponse:
+    return JSONResponse(reset())
+
+
+@app.get("/state")
+async def live_state() -> JSONResponse:
+    return JSONResponse(state())
+
+
+COLD_OPEN = """<!doctype html><html><head><meta charset=utf-8>
+<title>Shelf Life</title><style>
+html,body{margin:0;height:100%;background:#0d1117;color:#e6edf3;
+ font:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
+.c{height:100%;display:flex;flex-direction:column;justify-content:center;
+ align-items:center;padding:6vw;text-align:left}
+.m{max-width:1000px;background:#161b22;border-left:5px solid #bb8009;
+ border-radius:0 14px 14px 0;padding:38px 44px}
+.who{color:#7d8590;font-size:min(2.2vw,22px);margin-bottom:18px}
+.who b{color:#e6edf3}
+.t{font-size:min(4.4vw,52px);line-height:1.32;font-weight:600}
+.f{color:#7d8590;font-size:min(2vw,20px);margin-top:34px;max-width:1000px}
+.f b{color:#e3b341}
+a{color:#58a6ff;text-decoration:none;font-size:16px;margin-top:40px;display:block}
+</style></head><body><div class=c>
+<div class=m>
+ <div class=who><b>Marek Nowak</b> &middot; #voice-eng &middot; 23 July 2026</div>
+ <div class=t>&ldquo;Flagging that as a guess, not a finding.<br>I haven&rsquo;t proven it.&rdquo;</div>
+</div>
+<div class=f>Twelve days later he retracted it. <b>Every bot demoed tonight
+ will retrieve the guess and serve it to you as the answer.</b></div>
+<a href="/">&rarr; shelflife.ringamo.dev</a>
+</div></body></html>"""
+
+
+@app.get("/open", response_class=HTMLResponse)
+async def cold_open() -> str:
+    """Full-screen opening slide. No logo, no title - just the message that
+    argues with itself."""
+    return COLD_OPEN
 
 
 @app.get("/health")

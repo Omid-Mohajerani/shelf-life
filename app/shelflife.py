@@ -94,7 +94,12 @@ def assess(question: str, evidence: list[dict]) -> dict:
     overturned = [e for e in evidence if e.get("supersedes") in threads]
     # The author of the evidence hedged, on the record.
     hedged = [e for e in evidence if e.get("unproven")]
-    newest = max(evidence, key=lambda e: e["date"])
+    # Age the answer by the newest message that is part of a THREAD. Loose
+    # chatter ("new here, where do I start?") is retrieved by similarity but
+    # says nothing about whether the answer is still current, and letting it
+    # set the age makes every answer look freshly confirmed.
+    substantive = [e for e in evidence if e.get("thread")] or evidence
+    newest = max(substantive, key=lambda e: e["date"])
     age = _age_days(newest["date"])
 
     signals, level = [], "good"
@@ -127,8 +132,17 @@ def assess(question: str, evidence: list[dict]) -> dict:
         contributors[e["author"]]["latest"] = max(
             contributors[e["author"]]["latest"], e["date"])
 
+    trace = [f"newest evidence {age}d old", f"{len(evidence)} messages considered"]
+    if overturned:
+        trace.insert(0, f"{overturned[0]['date']} retracts thread '{overturned[0]['supersedes']}'")
+    if hedged:
+        trace.insert(0, f"{hedged[0]['date']} author-flagged unproven")
+    if not overturned and not hedged:
+        trace.insert(0, "no retraction, no hedge")
+
     return {
         "level": level, "headline": headline, "signals": signals,
+        "trace": f"{level} \u2190 " + " \u00b7 ".join(trace),
         "newest": newest["date"], "age_days": age,
         "ask": sorted(contributors.values(), key=lambda c: (-c["n"], c["latest"]))[:2],
         "evidence": [{"date": e["date"], "author": e["author"], "text": e["text"][:400],
