@@ -1,107 +1,151 @@
 # Shelf Life — submission
 
-**Cognee × Qdrant Hack Night, Berlin, 2026-08-14**
-**Author:** Omid Mohajerani (solo)
+**Cognee × Qdrant Hack Night, Berlin, 2026-08-14** · solo · Omid Mohajerani
 **Live:** https://shelflife.ringamo.dev · **Repo:** https://github.com/Omid-Mohajerani/shelf-life
 
 ---
 
-## The idea
+## The problem
 
 **Every answer in a company has a shelf life. Nothing tells you when it expired.**
 
-I work on Sprinklr voice integrations. The knowledge I need is not in the product
-documentation — it's in a Teams channel, in a thread, four replies down, written a year ago
-by someone who has since moved teams. I don't read those channels. Nobody does. And when I
-finally search for something, I find *an* answer with no way to tell whether it's still true.
+I work on Sprinklr voice integrations. What I need to know is almost never in the product
+documentation — it's in a channel, four replies down a thread, written a year ago by someone
+who has since moved teams. I don't read those channels. Nobody does. And when I finally
+search, I find *an* answer with no way to tell whether it's still true.
 
-That is not a retrieval problem. Retrieval works. It's a **trust** problem:
+That's not a retrieval problem. Retrieval works fine. It's a **trust** problem:
 
-- The official docs are **confidently wrong** about the specific case that's biting you.
-- The real answer is spread across a thread — a symptom, a wrong guess, the diagnosis, the
-  fix, and then a better fix.
-- Someone answered it in 2025 and someone else **overturned it** in 2026.
+- The docs are **confidently wrong** about the exact case that's biting you.
+- The real answer is spread across a thread — symptom, wrong guess, diagnosis, fix, better fix.
+- Someone answered in 2025 and someone else **overturned it** in 2026.
 - The author **said themselves they weren't sure** — and was later proved wrong.
 
 A similarity search returns all four, ranked by cosine distance, with no way to tell them apart.
 
 ## What it does
 
-Ask a question and you get four things instead of one:
+Ask a question and get four things instead of one:
 
 | | |
 |---|---|
-| **What the docs say** | Authoritative, versioned, dated — and sometimes wrong |
+| **What the docs say** | Authoritative, versioned — and sometimes wrong |
 | **What the team found** | The *conclusion* of the thread, not the first reply |
 | **How much to trust it** | `current` · `stale` · `unproven` · `superseded` |
-| **Who to ask** | The person who actually worked it out, and when |
+| **Who to ask** | The person who worked it out, and when they last touched it |
 
-### The verdict is computed, not guessed
+## Two speeds, on purpose
 
-Three things can undermine an answer, and they are **not** the same thing:
+This is the part I'd most like judged.
 
-- **`superseded`** — someone explicitly overturned it later
-- **`unproven`** — the author hedged, on the record
-- **`stale`** — nobody has touched it in months
+**The verdict needs no model.** To say *"superseded — overturned on 2026-08-04"* you don't
+have to understand anything; you need to know that among the matching messages, one carries a
+retraction dated later. That's a lookup. **Qdrant returns it in ~100ms**, and the page renders
+the banner, the evidence and who-to-ask immediately.
 
-Asking an LLM "is this trustworthy?" produces a vibe. Shelf Life reads `date`, `author`,
-`unproven` and `supersedes` off the actual messages behind the answer, so the verdict is
-deterministic — and it can always point at the message that caused it.
+**The answer does need a model.** *"The dialer was silent because the tenant-level scheduler
+was failing"* appears in no single message. **Cognee assembles it from the whole thread**, and
+that takes ~15s. It fills in after.
+
+So the page shows both, visibly, at different speeds:
+
+```
+verdict:  computed from the messages in 0.14s · no LLM
+answer:   cognee reading 8 threads, 14 months of channel …
+```
+
+An LLM asked *"is this trustworthy?"* produces a vibe. Reading `date`, `author`, `unproven`
+and `supersedes` off the actual messages is deterministic, and the page prints the trace:
+
+```
+superseded ← 2026-07-23 author-flagged unproven · 2026-08-04 retracts thread
+'exhausted' · newest evidence 10d old · 6 messages considered
+```
+
+**Three failure modes, deliberately not merged:** someone overturned it, the author never
+trusted it, or nobody's touched it in months. An LLM would blur those. Metadata doesn't.
 
 ## Why both Cognee and Qdrant
 
-Each does something the other cannot.
+> **Cognee holds the knowledge. Qdrant holds the receipts.**
 
-**Cognee** reads a whole *thread* and distils the conclusion. The real answer to "why won't
-my SFTP connector authenticate" exists in **no single message** — it's assembled from five.
-That's graph distillation, not chunk retrieval. Cognee is also asked the **docs** and the
-**channel as two separate datasets**, so their disagreement stays visible instead of being
-blended into one confident paragraph.
+- **Cognee** reads a whole *thread* and distils the conclusion, and is asked the **docs** and
+  the **channel as two separate datasets** so their disagreement stays visible instead of being
+  blended into one confident paragraph.
+- **Qdrant** holds every message with `date` / `author` / `thread` / `unproven` / `supersedes`
+  in the payload, and finds which messages back the answer. That's the evidence the verdict is
+  computed from.
 
-**Qdrant** holds every message with its trust metadata in the payload, and finds *which
-messages* back the answer. That's the evidence the verdict is computed from.
+## The demo — one question, three beats
 
-> Cognee gives you the answer. Qdrant gives you what you need to judge it.
+**1. Ask.** *"Our SFTP export connector won't connect but the credentials are correct."*
 
-## What's built
+- **Docs:** confidently wrong — blames a feature flag and module permissions.
+- **Channel:** the real cause. The connector signs RSA keys with legacy `ssh-rsa` (SHA-1),
+  which OpenSSH 8.8+ rejects. *"Add a scoped `PubkeyAcceptedAlgorithms` block, or replace the
+  key with ed25519."*
 
-- `tools/build_shelflife_corpus.py` — two sources, deliberately in conflict
-- `tools/ingest_shelflife.py` — two cognee datasets (docs, channel) + a Qdrant collection
-  carrying `date` / `author` / `thread` / `unproven` / `supersedes`
-- `app/shelflife.py` — parallel fan-out over both sources, evidence retrieval, verdict
-- `app/main.py` — the UI, single file, no external assets (venue wifi is not a dependency
-  a demo can afford)
+**2. Post one message into `#voice-eng`** — the actual channel page, not a button:
+*"Today's release ships a modern SSH client, so it negotiates rsa-sha2-256 properly now. The
+workaround above is obsolete."*
 
-## Demo — four questions, four different failure modes
+Qdrant takes it in **0.5s**. Cognee re-reads the channel in **~20s**.
 
-| Question | Docs | Channel | Verdict |
-|---|---|---|---|
-| SFTP connector won't connect, credentials are correct | **Confidently wrong** — blames a feature flag and module permissions | It's SHA-1: the connector signs RSA keys with legacy `ssh-rsa`, rejected by OpenSSH 8.8+ | `current` |
-| How do I push callback completion status out? | **Silent** — no such endpoint exists | Post Call Workflow → External REST API connector, + six gotchas | `current` |
-| How do I authenticate to the platform API? | Silent | 2025 said `client_credentials` — **overturned 2026-07-02**, now auth-code | **`superseded`** |
-| Dialer isn't calling, segment says Data Exhausted | Silent | First answer **flagged unproven by its own author**, then contradicted — it was an environment scheduler bug | **`superseded` + `unproven`** |
+**3. Ask the same question again.**
 
-**The last row is the whole project.** A vector search hands you a colleague's guess as
-though it were fact. Shelf Life says *"treat as a guess — the author said so themselves"*,
-shows the message where he retracted it, and gives you the corrected answer instead.
+> *"…a **modern SSH client** that negotiates rsa-sha2-256 automatically, **making the
+> workaround obsolete** — but older deployments must still apply the temporary change or
+> migrate to a non-SHA-1 key."*
+
+Same question, same prompts, same code. **It didn't just flag the old answer — it revised what
+it knows, and reconciled the old advice with the new fact.** One message did that.
+
+### And one question that only the graph can answer
+
+*"I'm new here. What gotchas does this team know that aren't in the official documentation?"*
+
+Returns the SHA-1 finding from May, the callback-push gotchas from June, and the auth-flow
+change from July — **four threads, fourteen months, assembled**. That answer exists in no
+single message, and no similarity search produces it.
 
 ## Ready on Monday
 
-It runs now, on a public HTTPS URL, with the corpus loaded. To point it at a real workspace
-you swap the ingest adapter — the trust layer doesn't care where messages came from. The
-format is Slack-shaped; my own problem is Microsoft Teams, which is the same shape and worse,
-because nobody has ever built anything for those channels.
+It runs now, on a public HTTPS URL, with an offline fallback so a lost network degrades the
+demo instead of killing it. To point it at a real workspace you swap the ingest adapter — the
+trust layer doesn't care where the messages came from. The format is Slack-shaped; my own
+problem is Microsoft Teams, which is the same shape and worse, because nobody has built
+anything for those channels.
+
+## Where this goes next
+
+The corpus here is text messages, because that's what fits in three hours. **But a channel
+isn't only text, and the trust model doesn't change:**
+
+- **Shared images and screenshots.** Half the real answers in an engineering channel are a
+  screenshot of a config screen or an error dialog. Those carry the same metadata that drives
+  the verdict — an author, a date, a thread — so a vision pass at ingest puts them in the graph
+  as first-class evidence. *"The screenshot you're relying on is fourteen months old and the UI
+  has been redesigned twice"* is the same verdict, computed the same way.
+- **Meeting transcripts.** Most decisions are never typed. They're said out loud in a call and
+  the channel only records the consequence. Transcripts are the missing half of the record —
+  and they come with something text channels don't have: **an attendee list and a timeline**,
+  which is a far richer provenance signal than a channel membership.
+- **The changelog as a third source.** The doc pages already carry `version` and `versionAt`.
+  *"This answer expired because the product shipped a release that touched it"* is a much
+  stronger staleness signal than age alone, and the hook is already there.
 
 ## Honest limitations
 
-- The corpus is **synthetic**. Every gotcha in it is real and cost somebody a real day, but
-  the messages were written for this demo rather than exported from a live workspace.
-- `unproven` and `supersedes` are **explicit metadata** here. In the wild you'd infer them —
-  from hedging language ("I think", "not sure", "guessing") and from later messages that
-  contradict earlier ones. That inference is the obvious next step, and I'd rather ship the
-  mechanism working on clean signals than a shaky classifier on messy ones.
-- **Staleness is age-based**, not change-based. Knowing an answer expired *because the product
-  shipped a release that touched it* needs the changelog as a third source. The doc pages
-  already carry `version` and `versionAt`, so the hook is there.
+- The corpus is **synthetic**. Every gotcha in it is real and cost somebody a real day, but the
+  messages were written for this demo rather than exported from a live workspace.
+- `unproven` and `supersedes` are **explicit metadata** in the live path. `app/infer.py`
+  recovers both from prose instead — hedges like *"best guess"*, retractions like *"update on
+  that: it was not the segment"* — and reproduces 30 of 32 hand annotations. Both retractions
+  are correctly *detected*; picking **which** earlier thread a retraction targets is where it
+  gets it wrong. Good enough to prove the signals are recoverable, not good enough to ship into
+  the path that drives a verdict, so it isn't.
+- **Staleness is age-based**, not change-based — see the changelog point above.
+- **A knowledge graph has no undo.** Removing the posted message means forgetting the dataset
+  and rebuilding it: 71 seconds. Worth knowing rather than hiding.
 - Doc pages ship as **paraphrased stubs** — vendor documentation is not mine to redistribute.
   The live demo runs against a local export.
