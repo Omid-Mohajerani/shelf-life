@@ -2,6 +2,9 @@
 not a dependency a demo can afford."""
 from __future__ import annotations
 
+import json
+import os
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
@@ -83,7 +86,8 @@ button:hover{border-color:#58a6ff}
    onkeydown="if(event.key=='Enter')go()">
  <button class=go onclick=go()>Ask</button>
 </div>
-<div class=presets>__PRESETS__</div>
+<div class=presets>__PRESETS__<label style="color:#7d8590;font-size:12.5px;margin-left:auto;align-self:center">
+ <input type=checkbox id=off style="width:auto;vertical-align:middle"> offline</label></div>
 <div id=out class=muted>Ask something.</div>
 </div><script>
 function preset(t){q.value=t;go()}
@@ -91,11 +95,11 @@ function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':
 async function go(){
  out.className='muted';out.textContent='Reading the docs and the channel\\u2026';
  const r=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-  body:JSON.stringify({question:q.value})});
+  body:JSON.stringify({question:q.value,offline:document.getElementById('off').checked})});
  const d=await r.json();
  const t=d.trust;
  let h='<div class="verdict '+t.level+'"><div class=lvl>'+esc(t.level)+'</div>'+
-   esc(t.headline)+
+   esc(t.headline)+(d.cached?' <span style="opacity:.6;font-size:13px">(cached)</span>':'')+
    (t.signals.length?'<div class=sig>'+t.signals.map(esc).join('<br>')+'</div>':'')+'</div>';
  h+='<div class=cols>'+
   '<div class="card docs'+(d.docs.silent?' silent':'')+'"><h3>Official documentation</h3>'+
@@ -136,13 +140,36 @@ async def index() -> str:
     return render()
 
 
+def _fallback() -> dict:
+    """Answers captured while the network worked. See tools/capture_fallback.py."""
+    path = os.path.join(os.path.dirname(__file__), "fallback.json")
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 @app.post("/ask")
 async def ask(req: Request) -> JSONResponse:
     body = await req.json()
     question = (body.get("question") or "").strip()
     if not question:
         return JSONResponse({"error": "empty question"}, status_code=400)
-    return JSONResponse(await answer(question))
+
+    cache = _fallback()
+    if body.get("offline"):
+        if question in cache:
+            return JSONResponse({**cache[question], "cached": True})
+        return JSONResponse({"error": "not in the offline cache"}, status_code=404)
+
+    try:
+        return JSONResponse(await answer(question))
+    except Exception:
+        # Losing the network mid-demo should degrade, not collapse.
+        if question in cache:
+            return JSONResponse({**cache[question], "cached": True})
+        raise
 
 
 @app.get("/health")
