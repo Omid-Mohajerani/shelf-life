@@ -29,12 +29,12 @@ PAGE = """<!doctype html><html><head><meta charset=utf-8>
 <title>#voice-eng</title><meta name=viewport content="width=device-width,initial-scale=1">
 <style>
 *{box-sizing:border-box}
-:root{--bg:#0a0d12;--panel:#141a22;--line:#232c38;--dim:#7d8da3;--fg:#e8eef7;
- --grn:#3fb950;--amb:#e3b341;--red:#f85149;--blu:#58a6ff}
+:root{--bg:#f6f8fa;--panel:#ffffff;--line:#d8dee4;--dim:#57606a;--fg:#1f2328;
+ --grn:#1a7f37;--amb:#9a6700;--red:#cf222e;--blu:#0969da}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
  font:16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
 .app{height:100%;display:grid;grid-template-columns:232px 1fr}
-.side{background:#0e131a;border-right:1px solid var(--line);padding:20px 0;
+.side{background:#f0f2f5;border-right:1px solid var(--line);padding:20px 0;
  display:flex;flex-direction:column;overflow:hidden}
 .side .ws{padding:0 18px 16px;border-bottom:1px solid var(--line);margin-bottom:16px}
 .side .ws b{font-size:16px;display:block}
@@ -43,8 +43,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
  margin:0 0 8px;padding:0 18px}
 .side a{display:flex;align-items:center;gap:9px;padding:7px 18px;color:var(--dim);
  text-decoration:none;font-size:14.5px}
-.side a:hover{background:#151c25;color:var(--fg)}
-.side a.on{background:#1c4b8a;color:#fff;font-weight:600}
+.side a:hover{background:#e4e8ed;color:var(--fg)}
+.side a.on{background:#0969da;color:#fff;font-weight:600}
 .side a .c{opacity:.55;font-size:13px;margin-left:auto}
 .main{display:flex;flex-direction:column;min-width:0}
 @media(max-width:760px){.app{grid-template-columns:1fr}.side{display:none}}
@@ -58,19 +58,19 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
  margin:22px 0 14px;letter-spacing:.04em}
 .day:before,.day:after{content:"";flex:1;height:1px;background:var(--line)}
 .m{display:flex;gap:13px;padding:9px 12px;border-radius:10px;margin-bottom:3px}
-.m:hover{background:#111721}
-.m.new{background:#16241a;animation:land .5s ease}
+.m:hover{background:#f2f4f7}
+.m.new{background:#e8f6ec;animation:land .5s ease}
 @keyframes land{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .av{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;
- font-weight:700;font-size:14px;color:#0a0d12;flex:0 0 38px}
+ font-weight:700;font-size:14px;color:#fff;flex:0 0 38px}
 .b .who{font-weight:600;font-size:15px}
 .b .who span{color:var(--dim);font-weight:400;font-size:12px;margin-left:9px}
 .b .tx{white-space:pre-wrap;font-size:15px;margin-top:2px}
 .thread{color:var(--dim);font-size:12px;margin-top:5px}
 .tag{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:20px;
  margin-top:7px;border:1px solid}
-.tag.u{color:var(--amb);border-color:#7a5a10;background:#241d0c}
-.tag.s{color:#ff9b95;border-color:#6b2220;background:#2a1213}
+.tag.u{color:#7a4f01;border-color:#d4a72c;background:#fff8e6}
+.tag.s{color:#8b1a24;border-color:#cf222e;background:#ffebe9}
 .comp{border-top:1px solid var(--line);padding:16px 26px 22px;background:var(--bg)}
 .comp .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;
  padding:12px 14px}
@@ -82,8 +82,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
 .comp .as .av{width:26px;height:26px;font-size:11px;border-radius:7px}
 button{font:inherit;cursor:pointer;border-radius:9px;padding:9px 18px;
  border:1px solid var(--line);background:var(--panel);color:var(--fg)}
-.send{background:#238636;border-color:#2ea043;color:#fff;font-weight:600}
-.send:hover{background:#2ea043}
+.send{background:#1f883d;border-color:#1a7f37;color:#fff;font-weight:600}
+.send:hover{background:#1a7f37}
 .ok{color:var(--grn);font-size:13.5px}
 </style></head><body><div class=app>
 <div class=side>
@@ -106,7 +106,7 @@ button{font:inherit;cursor:pointer;border-radius:9px;padding:9px 18px;
 <div class=comp><div class=box>
  <textarea id=msg>Update on the SFTP connector - today's platform release ships a modern SSH client, so it negotiates rsa-sha2-256 properly now. Don't go re-enabling ssh-rsa on any more servers; the workaround above is obsolete.</textarea>
  <div class=bar>
-  <span class=as><span class=av style="background:#58a6ff">OM</span>
+  <span class=as><span class=av style="background:#0969da">OM</span>
    posting as <b style="color:var(--fg)">Omid Mohajerani</b></span>
   <span class=ok id=ok></span>
   <button onclick=undo()>Undo</button>
@@ -119,7 +119,7 @@ async function send(){
  await fetch('/inject',{method:'POST'});
  const t=document.getElementById('msg').value;
  const d=document.createElement('div');d.className='m new';
- d.innerHTML='<span class=av style="background:#58a6ff">OM</span><div class=b>'+
+ d.innerHTML='<span class=av style="background:#0969da">OM</span><div class=b>'+
   '<div class=who>Omid Mohajerani <span>14 Aug 2026 &middot; just now</span></div>'+
   '<div class=tx></div><span class="tag s">\\u26a0 overturns an earlier answer</span></div>';
  d.querySelector('.tx').textContent=t;
@@ -136,7 +136,7 @@ const f=document.getElementById('feed');f.scrollTop=f.scrollHeight;
 </script></body></html>"""
 
 
-PALETTE = ["#58a6ff", "#3fb950", "#e3b341", "#f778ba", "#a371f7"]
+PALETTE = ["#0969da", "#1a7f37", "#9a6700", "#bf3989", "#8250df"]
 
 
 def _pretty(d: str) -> str:

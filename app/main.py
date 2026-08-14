@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from live import inject, reset, state
 from shelflife import answer, verdict_only
 import chat
-from ui import PAGE, PRESETS
+from ui import PAGE
 
 app = FastAPI(title="Shelf Life")
 
@@ -19,11 +19,7 @@ app = FastAPI(title="Shelf Life")
 
 
 def render() -> str:
-    presets = "".join(
-        f"""<button onclick="preset('{q.replace("'", "\\'")}')">{label}</button>"""
-        for label, q in PRESETS
-    )
-    return PAGE.replace("__PRESETS__", presets)
+    return PAGE
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -96,18 +92,22 @@ async def live_state() -> JSONResponse:
 
 COLD_OPEN = """<!doctype html><html><head><meta charset=utf-8>
 <title>Shelf Life</title><style>
-html,body{margin:0;height:100%;background:#0d1117;color:#e6edf3;
- font:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
+html,body{margin:0;height:100%;background:#f6f8fa;color:#1f2328;
+ font:16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
+/* The quote is set in serif on purpose: it should read as a statement on a
+   wall, not as another dark-mode app screen. */
+.t,.who{font-family:Georgia,"Iowan Old Style","Times New Roman",serif}
 .c{height:100%;display:flex;flex-direction:column;justify-content:center;
  align-items:center;padding:6vw;text-align:left}
-.m{max-width:1000px;background:#161b22;border-left:5px solid #bb8009;
+.m{max-width:1000px;background:#fff;border-left:5px solid #d4a72c;
+ box-shadow:0 2px 12px rgba(31,35,40,.08);
  border-radius:0 14px 14px 0;padding:38px 44px}
-.who{color:#7d8590;font-size:min(2.2vw,22px);margin-bottom:18px}
-.who b{color:#e6edf3}
+.who{color:#57606a;font-size:min(2.2vw,22px);margin-bottom:18px}
+.who b{color:#1f2328}
 .t{font-size:min(4.4vw,52px);line-height:1.32;font-weight:600}
-.f{color:#7d8590;font-size:min(2vw,20px);margin-top:34px;max-width:1000px}
-.f b{color:#e3b341}
-a{color:#58a6ff;text-decoration:none;font-size:16px;margin-top:40px;display:block}
+.f{color:#57606a;font-size:min(2vw,20px);margin-top:34px;max-width:1000px}
+.f b{color:#9a6700}
+a{color:#0969da;text-decoration:none;font-size:16px;margin-top:40px;display:block}
 </style></head><body><div class=c>
 <div class=m>
  <div class=who><b>Marek Nowak</b> &middot; #voice-eng &middot; 23 July 2026</div>
