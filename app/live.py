@@ -29,7 +29,7 @@ _qdrant = QdrantClient(url=os.environ.get("QDRANT_URL", "http://127.0.0.1:6333")
 # that the system authored it. It retracts the SFTP workaround thread.
 NEW_MESSAGE = {
     "source": "channel", "channel": "voice-eng", "date": "2026-08-14",
-    "author": "Nadia Farsi", "author_title": "Senior Voice Engineer",
+    "author": "Omid Mohajerani", "author_title": "Senior Voice Engineer",
     "thread": "sftp2", "unproven": False, "supersedes": "sftp",
     "text": ("Update on the SFTP connector - today's platform release ships a "
              "modern SSH client, so it negotiates rsa-sha2-256 properly now. "

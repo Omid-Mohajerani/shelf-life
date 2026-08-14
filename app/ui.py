@@ -124,6 +124,9 @@ button:hover{border-color:var(--blu);transform:translateY(-1px)}
 .foot img{width:78px;height:78px;background:#fff;padding:5px;border-radius:9px}
 .foot b{color:var(--fg);font-size:16px}
 .muted{color:var(--dim);padding:26px 0}
+.chan{color:var(--blu);text-decoration:none;font-size:13.5px;padding:8px 14px;
+ border:1px solid var(--line);border-radius:10px;transition:.15s}
+.chan:hover{border-color:var(--blu)}
 .think{display:flex;align-items:center;gap:10px;color:var(--dim);font-style:italic}
 .think .dot{width:9px;height:9px;border-radius:50%;background:var(--amb);
  animation:pulse 1s infinite}
@@ -138,24 +141,13 @@ button:hover{border-color:var(--blu);transform:translateY(-1px)}
  <button class=go onclick=go()>Ask</button>
 </div>
 <div class=row>__PRESETS__
+ <a href="/chat" target="_blank" class=chan>#voice-eng &rarr;</a>
  <label class="tiny spacer"><input type=checkbox id=off style="vertical-align:middle"> offline</label>
 </div>
 
 <div class=pipe id=pipe></div>
 <div class=quip id=quip></div>
 <div id=out class=muted>Ask something.</div>
-
-<div class=post>
- <h3>Post to #voice-eng</h3>
- <div class=t>The verdict is computed from the messages. Change the messages and
-  ask again &mdash; nothing else changes.</div>
- <textarea id=newmsg>Update on the SFTP connector - today's platform release ships a modern SSH client, so it negotiates rsa-sha2-256 properly now. Don't go re-enabling ssh-rsa on any more servers; the workaround above is obsolete.</textarea>
- <div class=b>
-  <button class=send onclick=post()>Post as Nadia Farsi</button>
-  <button onclick=undo()>Undo</button>
-  <span class=ok id=posted></span>
- </div>
-</div>
 
 <div class=foot><div><b>shelflife.ringamo.dev</b>
  <span class=tiny>&nbsp;&nbsp;cognee &middot; qdrant &middot; live now</span></div></div>

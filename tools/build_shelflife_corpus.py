@@ -94,7 +94,7 @@ All Settings -> APIs and Integrations.
 #          "supersedes:<key>" - this message overturns an earlier thread
 
 PEOPLE = {
-    "nadia": ("Nadia Farsi", "Senior Voice Engineer"),
+    "omid": ("Omid Mohajerani", "Senior Voice Engineer"),
     "jonas": ("Jonas Weber", "Integration Engineer"),
     "marek": ("Marek Nowak", "Platform Engineer"),
     "priya": ("Priya Raman", "Delivery Lead"),
@@ -105,7 +105,7 @@ CHANNEL = [
     # ---- 2025: an answer that is correct at the time and rots later ---------
     ("2025-06-12", "jonas", "Anyone got the OAuth flow for the platform APIs working? "
      "I want to script the token.", "oauth"),
-    ("2025-06-12", "nadia", "client_credentials works. Register the app, grab client id "
+    ("2025-06-12", "omid", "client_credentials works. Register the app, grab client id "
      "and secret, POST to /oauth/token with grant_type=client_credentials. Token lasts "
      "about a month.", "oauth"),
     ("2025-06-12", "jonas", "Perfect, that worked. Thanks.", "oauth"),
@@ -121,35 +121,35 @@ CHANNEL = [
      "from my laptop with the same key.", "sftp"),
     ("2026-05-19", "jonas", "Docs just say verify the connection details and check the "
      "firewall. Firewall is open, I can see the connection arrive.", "sftp"),
-    ("2026-05-20", "nadia", "This is not a credentials problem. Check /var/log/auth.log - "
+    ("2026-05-20", "omid", "This is not a credentials problem. Check /var/log/auth.log - "
      "I bet you see 'Disconnected ... [preauth]' mid-authentication.", "sftp"),
     ("2026-05-20", "jonas", "Yes! Exactly that. What is it?", "sftp"),
-    ("2026-05-20", "nadia", "Sprinklr's SFTP connector uses an old SSH client that signs "
+    ("2026-05-20", "omid", "Sprinklr's SFTP connector uses an old SSH client that signs "
      "RSA keys with the legacy ssh-rsa signature, which is SHA-1. OpenSSH 8.8 and later "
      "disabled SHA-1 RSA signatures by default and only accept rsa-sha2-256 or "
      "rsa-sha2-512. The server rejects the signature type and drops the connection. "
      "The UI surfaces that as a generic connection error, which is why it looks like bad "
      "credentials.", "sftp"),
-    ("2026-05-20", "nadia", "Quick fix for test, scoped to the sftp group only:\n"
+    ("2026-05-20", "omid", "Quick fix for test, scoped to the sftp group only:\n"
      "Match Group sftpusers\n    PubkeyAcceptedAlgorithms +ssh-rsa\n"
      "then systemctl reload sshd. The rest of the box keeps modern defaults.", "sftp"),
-    ("2026-05-20", "nadia", "For production do it the other way round - use an ed25519 or "
+    ("2026-05-20", "omid", "For production do it the other way round - use an ed25519 or "
      "ECDSA key for the destination and avoid SHA-1 entirely. Only re-enable ssh-rsa "
      "server-side, narrowly scoped, if you have no choice.", "sftp"),
     ("2026-05-20", "priya", "Can we get this into the docs? It cost Jonas two days.", "sftp"),
-    ("2026-05-20", "nadia", "Raised it. Not holding my breath.", "sftp"),
+    ("2026-05-20", "omid", "Raised it. Not holding my breath.", "sftp"),
 
     # ---- 2026-06: the recipe that exists nowhere in the docs ---------------
     ("2026-06-24", "marek", "Is there a GET callback-status API? I need callback "
      "completion out to our system and I can't find an endpoint.", "callback"),
-    ("2026-06-25", "nadia", "There isn't one. Don't keep looking. It's a push, not a pull.",
+    ("2026-06-25", "omid", "There isn't one. Don't keep looking. It's a push, not a pull.",
      "callback"),
-    ("2026-06-29", "nadia", "Proven on prod-2 today. Campaign Post Call Workflow journey "
+    ("2026-06-29", "omid", "Proven on prod-2 today. Campaign Post Call Workflow journey "
      "-> External REST API connector -> your authenticated webhook. Correlation works: "
      "Schedule Callback returns a taskId and it comes back on the call as "
      "VOICE_CONVERSATION.SCHEDULED_CALLBACK_TASK_ID, so the push can carry it and the "
      "receiver matches it up.", "callback"),
-    ("2026-06-29", "nadia", "Gotchas, each of which cost me real time:\n"
+    ("2026-06-29", "omid", "Gotchas, each of which cost me real time:\n"
      "- Register an External REST API first (All Settings -> APIs and Integrations). "
      "The journey API node has no inline URL, only a connector dropdown.\n"
      "- Map values with the resource PICKER, not raw VOICE_CONVERSATION.x in custom code. "
@@ -161,7 +161,7 @@ CHANNEL = [
     ("2026-06-29", "marek", "This should be a docs page on its own.", "callback"),
 
     # ---- 2026-07-02: supersedes the 2025 OAuth answer ----------------------
-    ("2026-07-02", "nadia", "Heads up - client_credentials is not enabled any more, you "
+    ("2026-07-02", "omid", "Heads up - client_credentials is not enabled any more, you "
      "get 'Default Admin User Not Setup'. Use the auth-code flow instead: browser, logged "
      "in, hit /oauth/authorize with client_id and redirect_uri, submit, pick the client, "
      "submit, then exchange the code at /oauth/token. Headers on calls are "
@@ -179,7 +179,7 @@ CHANNEL = [
      "segment on the same filter rather than another upload.", "exhausted", "unproven"),
     ("2026-07-23", "marek", "Flagging that as a guess, not a finding. I haven't proven it.",
      "exhausted", "unproven"),
-    ("2026-07-23", "nadia", "Rechurn is not the lever either - its job is overriding "
+    ("2026-07-23", "omid", "Rechurn is not the lever either - its job is overriding "
      "attempt limits for leads that HAVE been attempted. With Attempted Records 0 there's "
      "no limit to override.", "exhausted"),
     ("2026-08-04", "marek", "Update on the Data Exhausted thing: it was not the segment. "
@@ -192,15 +192,15 @@ CHANNEL = [
     # ---- 2026-07-31: silent failure the docs describe but nobody reads -----
     ("2026-07-31", "jonas", "Meridian VoiceConnect trunk: outbound is fine, inbound "
      "never arrives. No error anywhere. Trunk looks half alive.", "acl"),
-    ("2026-07-31", "nadia", "What's in the IP Access Control List?", "acl"),
+    ("2026-07-31", "omid", "What's in the IP Access Control List?", "acl"),
     ("2026-07-31", "jonas", "The AudioCodes hostname - "
      "qqjjgaaaqdcr.sip1-region1.audiocodes.io. It resolves to the right IP, I checked.",
      "acl"),
-    ("2026-07-31", "nadia", "That's it. The VC ACL does not resolve host names, it "
+    ("2026-07-31", "omid", "That's it. The VC ACL does not resolve host names, it "
      "compares the literal value. A resolving implementation would have matched, so we "
      "know it doesn't. Put 198.51.100.15/32 in there.", "acl"),
     ("2026-07-31", "jonas", "Inbound working. That would have taken me another day.", "acl"),
-    ("2026-07-31", "nadia", "Whitelist the media address too - 198.51.100.49. Signalling and "
+    ("2026-07-31", "omid", "Whitelist the media address too - 198.51.100.49. Signalling and "
      "media are different hosts and people miss the second one.", "acl"),
 
     # ---- the new joiner, a year later, asking all of it again -------------

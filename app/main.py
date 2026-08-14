@@ -10,6 +10,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from live import inject, reset, state
 from shelflife import answer, verdict_only
+import chat
 from ui import PAGE, PRESETS
 
 app = FastAPI(title="Shelf Life")
@@ -116,6 +117,12 @@ a{color:#58a6ff;text-decoration:none;font-size:16px;margin-top:40px;display:bloc
  will retrieve the guess and serve it to you as the answer.</b></div>
 <a href="/">&rarr; shelflife.ringamo.dev</a>
 </div></body></html>"""
+
+
+@app.get("/chat", response_class=HTMLResponse)
+async def channel() -> str:
+    """#voice-eng itself - the raw material the verdict is computed from."""
+    return chat.render()
 
 
 @app.get("/open", response_class=HTMLResponse)
