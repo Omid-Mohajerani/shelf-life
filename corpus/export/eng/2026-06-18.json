@@ -1,0 +1,28 @@
+[
+  {
+    "client_msg_id": "a16b525581a33488cdb775e8",
+    "type": "message",
+    "user": "U0TOM",
+    "text": "We reverted billing back to Postgres. Planetscale pricing killed us at our write volume.",
+    "ts": "1781773200.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Tom Okafor",
+      "display_name": "tom",
+      "name": "tom"
+    }
+  },
+  {
+    "client_msg_id": "02371b2b52e8e97aa75989fc",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "Migration ran clean. Nothing to do on your side.",
+    "ts": "1781773337.000001",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    }
+  }
+]

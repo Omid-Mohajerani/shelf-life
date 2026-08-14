@@ -1,0 +1,15 @@
+[
+  {
+    "client_msg_id": "aea80248b4a5bd766c8d8546",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "Reminder: staging rehearsal is not optional, it caught a 115-commit drift last week.",
+    "ts": "1782378000.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    }
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "client_msg_id": "e49df14f3778fb4119be343f",
+    "type": "message",
+    "user": "U0TOM",
+    "text": "Agreed. We should slow down hiring until the Meridian deal closes - a jump in headcount right before diligence looks bad on the line.",
+    "ts": "1773219600.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Tom Okafor",
+      "display_name": "tom",
+      "name": "tom"
+    }
+  },
+  {
+    "client_msg_id": "375d0a74dbb2014de3a67964",
+    "type": "message",
+    "user": "U0ANA",
+    "text": "Do it. Tom, announce it to engineering as a freeze until Q4. Do not give a reason.",
+    "ts": "1773219737.000001",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Ana Reyes",
+      "display_name": "ana",
+      "name": "ana"
+    }
+  },
+  {
+    "client_msg_id": "588b8ae50f52de2cfbbc320c",
+    "type": "message",
+    "user": "U0PRI",
+    "text": "And nobody puts the reason in writing anywhere outside this channel.",
+    "ts": "1773219874.000002",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya",
+      "name": "priya"
+    }
+  }
+]

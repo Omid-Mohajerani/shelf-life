@@ -1,0 +1,32 @@
+[
+  {
+    "client_msg_id": "85c59e1b97aa45ee4683f12b",
+    "type": "message",
+    "user": "U0TOM",
+    "text": "Shipped. So the deploy process is: CI builds and tags by SHA, you rehearse on staging, then deploy that same SHA to prod. Backup before migrations.",
+    "ts": "1778230800.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Tom Okafor",
+      "display_name": "tom",
+      "name": "tom"
+    },
+    "thread_ts": "1778058000.000000",
+    "parent_user_id": "U0DEV"
+  },
+  {
+    "client_msg_id": "d043ae7bc7bef3b09bd04495",
+    "type": "message",
+    "user": "U0SAM",
+    "text": "Clear. Thanks both.",
+    "ts": "1778230937.000001",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Sam Belova",
+      "display_name": "sam",
+      "name": "sam"
+    },
+    "thread_ts": "1778058000.000000",
+    "parent_user_id": "U0DEV"
+  }
+]

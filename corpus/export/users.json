@@ -1,0 +1,77 @@
+[
+  {
+    "id": "U0ANA",
+    "team_id": "T0NORTHWIND",
+    "name": "ana",
+    "real_name": "Ana Reyes",
+    "deleted": false,
+    "is_admin": true,
+    "is_bot": false,
+    "profile": {
+      "real_name": "Ana Reyes",
+      "display_name": "ana",
+      "title": "CEO",
+      "email": "ana@northwind.example"
+    }
+  },
+  {
+    "id": "U0TOM",
+    "team_id": "T0NORTHWIND",
+    "name": "tom",
+    "real_name": "Tom Okafor",
+    "deleted": false,
+    "is_admin": true,
+    "is_bot": false,
+    "profile": {
+      "real_name": "Tom Okafor",
+      "display_name": "tom",
+      "title": "CTO",
+      "email": "tom@northwind.example"
+    }
+  },
+  {
+    "id": "U0PRI",
+    "team_id": "T0NORTHWIND",
+    "name": "priya",
+    "real_name": "Priya Nair",
+    "deleted": false,
+    "is_admin": true,
+    "is_bot": false,
+    "profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya",
+      "title": "CFO",
+      "email": "priya@northwind.example"
+    }
+  },
+  {
+    "id": "U0DEV",
+    "team_id": "T0NORTHWIND",
+    "name": "devi",
+    "real_name": "Devi Kapoor",
+    "deleted": false,
+    "is_admin": false,
+    "is_bot": false,
+    "profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "title": "Staff Engineer",
+      "email": "devi@northwind.example"
+    }
+  },
+  {
+    "id": "U0SAM",
+    "team_id": "T0NORTHWIND",
+    "name": "sam",
+    "real_name": "Sam Belova",
+    "deleted": false,
+    "is_admin": false,
+    "is_bot": false,
+    "profile": {
+      "real_name": "Sam Belova",
+      "display_name": "sam",
+      "title": "Contractor, Platform",
+      "email": "sam@northwind.example"
+    }
+  }
+]

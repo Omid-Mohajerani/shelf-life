@@ -1,0 +1,41 @@
+[
+  {
+    "client_msg_id": "863eb2a04c0f9383abdbf4a5",
+    "type": "message",
+    "user": "U0ANA",
+    "text": "You'll have seen Tom's note in #eng. Hiring is paused until Q4. Nothing to read into it, we're just being deliberate this year.",
+    "ts": "1775206800.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Ana Reyes",
+      "display_name": "ana",
+      "name": "ana"
+    }
+  },
+  {
+    "client_msg_id": "c846ced087f1f2157d9b1989",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "Understood. Does the offsite still happen?",
+    "ts": "1775206937.000001",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    }
+  },
+  {
+    "client_msg_id": "9fd593c46b3747c828526310",
+    "type": "message",
+    "user": "U0ANA",
+    "text": "Offsite still happens.",
+    "ts": "1775207074.000002",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Ana Reyes",
+      "display_name": "ana",
+      "name": "ana"
+    }
+  }
+]

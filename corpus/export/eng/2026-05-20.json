@@ -1,0 +1,15 @@
+[
+  {
+    "client_msg_id": "ab06a69c50fa25d4bef1ba1a",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "Postgres 16 upgrade on staging went fine.",
+    "ts": "1779267600.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    }
+  }
+]

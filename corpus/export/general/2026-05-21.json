@@ -1,0 +1,15 @@
+[
+  {
+    "client_msg_id": "6b535ff233e8d197e6f55f67",
+    "type": "message",
+    "user": "U0PRI",
+    "text": "New coffee machine. Please read the label before descaling it.",
+    "ts": "1779354000.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya",
+      "name": "priya"
+    }
+  }
+]

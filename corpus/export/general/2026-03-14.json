@@ -1,0 +1,15 @@
+[
+  {
+    "client_msg_id": "5b63ce4349f7114e8b0d8f98",
+    "type": "message",
+    "user": "U0PRI",
+    "text": "Reminder: expenses for Q1 close on the 31st.",
+    "ts": "1773478800.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Priya Nair",
+      "display_name": "priya",
+      "name": "priya"
+    }
+  }
+]

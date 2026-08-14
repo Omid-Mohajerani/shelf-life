@@ -1,0 +1,32 @@
+[
+  {
+    "client_msg_id": "daf79646e68c65e19894484f",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "It fails fast and refuses to deploy. No half-states.",
+    "ts": "1778144400.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    },
+    "thread_ts": "1778058000.000000",
+    "parent_user_id": "U0DEV"
+  },
+  {
+    "client_msg_id": "0c8c249ec503b63cff3e0366",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "PR is up. deploy.sh now takes a SHA, and there's rehearse-staging.sh that runs the whole thing against staging first and refuses to run if you point it at prod.",
+    "ts": "1778144537.000001",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    },
+    "thread_ts": "1778058000.000000",
+    "parent_user_id": "U0DEV"
+  }
+]

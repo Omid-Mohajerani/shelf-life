@@ -1,0 +1,76 @@
+[
+  {
+    "client_msg_id": "bede0dfb4e8e74ab1dfd527b",
+    "type": "message",
+    "user": "U0TOM",
+    "text": "Heads up everyone - we're freezing new hires until Q4.",
+    "ts": "1775120400.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Tom Okafor",
+      "display_name": "tom",
+      "name": "tom"
+    },
+    "thread_ts": "1775120400.000000"
+  },
+  {
+    "client_msg_id": "7ab9748340f1a5b70461bbab",
+    "type": "message",
+    "user": "U0SAM",
+    "text": "Any reason? I'm trying to plan contractor capacity for the quarter.",
+    "ts": "1775120537.000001",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Sam Belova",
+      "display_name": "sam",
+      "name": "sam"
+    },
+    "thread_ts": "1775120400.000000",
+    "parent_user_id": "U0TOM"
+  },
+  {
+    "client_msg_id": "3c2af38629d13be342629f32",
+    "type": "message",
+    "user": "U0TOM",
+    "text": "Can't say much right now. Just plan for Q4.",
+    "ts": "1775120674.000002",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Tom Okafor",
+      "display_name": "tom",
+      "name": "tom"
+    },
+    "thread_ts": "1775120400.000000",
+    "parent_user_id": "U0TOM"
+  },
+  {
+    "client_msg_id": "74a94e9970ecc1a9dd36b95f",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "Does that include the backfill for Marco's role?",
+    "ts": "1775120811.000003",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    },
+    "thread_ts": "1775120400.000000",
+    "parent_user_id": "U0TOM"
+  },
+  {
+    "client_msg_id": "2ebbfc6569ccfaf074bc1868",
+    "type": "message",
+    "user": "U0TOM",
+    "text": "Yes. Everything.",
+    "ts": "1775120948.000004",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Tom Okafor",
+      "display_name": "tom",
+      "name": "tom"
+    },
+    "thread_ts": "1775120400.000000",
+    "parent_user_id": "U0TOM"
+  }
+]

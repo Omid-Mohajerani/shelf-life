@@ -1,0 +1,28 @@
+[
+  {
+    "client_msg_id": "3427ac398cb65ce1d0978cef",
+    "type": "message",
+    "user": "U0DEV",
+    "text": "The nightly job is flaky again. It's the same DNS resolver timeout as last month.",
+    "ts": "1773306000.000000",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Devi Kapoor",
+      "display_name": "devi",
+      "name": "devi"
+    }
+  },
+  {
+    "client_msg_id": "7a182f23f364f02aaf18179e",
+    "type": "message",
+    "user": "U0SAM",
+    "text": "I can put a retry around it but the real fix is a second resolver.",
+    "ts": "1773306137.000001",
+    "team": "T0NORTHWIND",
+    "user_profile": {
+      "real_name": "Sam Belova",
+      "display_name": "sam",
+      "name": "sam"
+    }
+  }
+]
