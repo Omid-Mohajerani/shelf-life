@@ -35,7 +35,14 @@ button{font:inherit;cursor:pointer;background:var(--panel);color:var(--fg);
  border:1px solid var(--line);border-radius:10px;padding:13px 18px;transition:.15s}
 button:hover{border-color:var(--blu);transform:translateY(-1px)}
 .go{background:#1f883d;border-color:#1a7f37;color:#fff;padding:13px 30px;font-weight:600}
-.off{display:block;margin:12px 0 0;text-align:right}
+.try{margin:13px 0 0;font-size:13.5px;color:var(--dim);display:flex;gap:8px;
+ flex-wrap:wrap;align-items:baseline}
+.try a{color:var(--blu);cursor:pointer;text-decoration:none;
+ border-bottom:1px dotted currentColor;max-width:none}
+.try a:hover{border-bottom-style:solid}
+.off{margin-left:auto;white-space:nowrap;display:flex;gap:14px;align-items:baseline}
+.off a{color:var(--dim);cursor:pointer;text-decoration:none;border-bottom:1px dotted}
+.off a:hover{color:var(--red)}
 .tiny{font-size:12px;color:var(--dim)}
 
 /* live pipeline */
@@ -150,7 +157,16 @@ button:hover{border-color:var(--blu);transform:translateY(-1px)}
    onkeydown="if(event.key=='Enter')go()">
  <button class=go onclick=go()>Ask</button>
 </div>
-<label class="tiny off"><input type=checkbox id=off style="vertical-align:middle"> offline</label>
+<div class=try>Try:
+ <a data-q="Our SFTP export connector won't connect but the credentials are correct. What is wrong?"
+    onclick="preset(this.dataset.q)">the docs are wrong</a>
+ <a data-q="The dialer isn't calling and the segment says Data Exhausted. What do I do?"
+    onclick="preset(this.dataset.q)">the answer was retracted</a>
+ <a data-q="I am new here. What gotchas does this team know that are not in the official documentation?"
+    onclick="preset(this.dataset.q)">what does this team know that the docs don't?</a>
+ <span class=off><a onclick=resetDemo() id=rst>reset</a>
+  <label class=tiny><input type=checkbox id=off style="vertical-align:middle"> offline</label></span>
+</div>
 
 <div class=pipe id=pipe></div>
 <div id=out class=muted>Ask something.</div>
@@ -261,6 +277,12 @@ function render(t,d){
    (e.supersedes?'<div class="flag s">\u26a0 this overturns an earlier answer</div>':'')+
    '</div></div>').join('')+'</div>';
  return h;
+}
+
+async function resetDemo(){
+ const el=document.getElementById('rst');
+ await fetch('/reset',{method:'POST'});
+ el.textContent='reset \u2713';setTimeout(()=>{el.textContent='reset';},1600);
 }
 
 async function post(){
