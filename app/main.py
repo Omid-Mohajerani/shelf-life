@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from live import inject, reset, state
 from shelflife import answer, verdict_only
 import chat
+from talk import TALK
 from ui import LOGOS, PAGE
 
 app = FastAPI(title="Shelf Life")
@@ -135,6 +136,52 @@ async def cold_open() -> str:
     """Full-screen opening slide. No logo, no title - just the message that
     argues with itself."""
     return COLD_OPEN
+
+
+@app.post("/vapi")
+async def vapi(req: Request) -> JSONResponse:
+    """VAPI tool webhook. Same answer() the web page uses - the voice agent is a
+    second front door onto the same memory, not a second implementation."""
+    body = await req.json()
+    msg = body.get("message", {})
+    calls = msg.get("toolCalls") or msg.get("toolCallList") or []
+    if not calls:
+        return JSONResponse({"results": []})
+
+    out = []
+    for c in calls:
+        fn = c.get("function") or {}
+        args = fn.get("arguments") or {}
+        if isinstance(args, str):
+            try:
+                args = json.loads(args)
+            except Exception:
+                args = {}
+        question = (args.get("question") or "").strip()
+        if not question:
+            out.append({"toolCallId": c.get("id"), "result": "I did not catch the question."})
+            continue
+
+        d = await answer(question)
+        t = d["trust"]
+        spoken = f"Trust verdict: {t['level']}. {t['headline']} "
+        if t["signals"]:
+            spoken += " ".join(t["signals"]) + " "
+        spoken += "What the team found: " + d["channel"]["answer"][:900] + " "
+        if d["docs"]["silent"]:
+            spoken += "The official documentation does not cover this. "
+        if t.get("ask"):
+            a = t["ask"][0]
+            spoken += f"Ask {a['name']}, {a['title']}, who has {a['n']} messages on it."
+        out.append({"toolCallId": c.get("id"), "result": spoken})
+
+    return JSONResponse({"results": out})
+
+
+@app.get("/talk", response_class=HTMLResponse)
+async def talk() -> str:
+    return TALK.replace("__KEY__", os.environ.get("VAPI_PUBLIC_KEY", "")) \
+               .replace("__ASSISTANT__", os.environ.get("VAPI_ASSISTANT_ID", ""))
 
 
 @app.get("/health")
