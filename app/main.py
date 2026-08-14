@@ -75,9 +75,13 @@ async def verdict(req: Request) -> JSONResponse:
 
 
 @app.post("/inject")
-async def inject_msg() -> JSONResponse:
-    """Post the new message. Same collection the verdict is computed from."""
-    return JSONResponse(inject())
+async def inject_msg(req: Request) -> JSONResponse:
+    """Post a message into both stores, exactly as the corpus went in."""
+    try:
+        body = await req.json()
+    except Exception:
+        body = {}
+    return JSONResponse(inject(body.get("text")))
 
 
 @app.post("/reset")

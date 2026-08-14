@@ -85,6 +85,8 @@ button{font:inherit;cursor:pointer;border-radius:9px;padding:9px 18px;
 .send{background:#1f883d;border-color:#1a7f37;color:#fff;font-weight:600}
 .send:hover{background:#1a7f37}
 .ok{color:var(--grn);font-size:13.5px}
+.working{color:var(--dim);font-size:13.5px;font-style:italic}
+.working{color:var(--dim);font-size:13.5px;font-style:italic}
 </style></head><body><div class=app>
 <div class=side>
  <div class=ws><b>Northwind CX</b><span>Sprinklr delivery team</span></div>
@@ -115,22 +117,41 @@ button{font:inherit;cursor:pointer;border-radius:9px;padding:9px 18px;
 </div></div>
 </div></div><script>
 async function send(){
- const ok=document.getElementById('ok');ok.textContent='sending\\u2026';
- await fetch('/inject',{method:'POST'});
+ const ok=document.getElementById('ok');
  const t=document.getElementById('msg').value;
- const d=document.createElement('div');d.className='m new';
+ const t0=Date.now(); let n=0;
+ const steps=['posting to #voice-eng…',
+   'cognee is re-reading the channel…',
+   'rebuilding the graph around this thread…',
+   'almost — it re-reads the whole thread, not just the message…'];
+ ok.className='working'; ok.textContent=steps[0];
+ const tick=setInterval(()=>{n++;ok.textContent=steps[Math.min(n,steps.length-1)]+
+   '  ('+((Date.now()-t0)/1000).toFixed(1)+'s)';},2500);
+
+ // Show the message land immediately - the wait is cognee re-reading, not the post.
+ const d=document.createElement('div'); d.className='m new';
  d.innerHTML='<span class=av style="background:#0969da">OM</span><div class=b>'+
-  '<div class=who>Omid Mohajerani <span>14 Aug 2026 &middot; just now</span></div>'+
-  '<div class=tx></div><span class="tag s">\\u26a0 overturns an earlier answer</span></div>';
+  '<div class=who>Omid Mohajerani <span>Senior Voice Engineer · just now</span></div>'+
+  '<div class=tx></div><span class="tag s">⚠ overturns an earlier answer</span></div>';
  d.querySelector('.tx').textContent=t;
  document.getElementById('feed').appendChild(d);
  d.scrollIntoView({behavior:'smooth',block:'center'});
- ok.textContent='\\u2713 posted \\u2014 now go back and ask again';
+
+ const r=await fetch('/inject',{method:'POST',
+   headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});
+ const j=await r.json();
+ clearInterval(tick); ok.className='ok';
+ ok.textContent='✓ Qdrant '+j.qdrant_ms+'ms · cognee re-read '+
+   (j.cognee_ms/1000).toFixed(1)+'s — now ask again';
 }
+
 async function undo(){
+ const ok=document.getElementById('ok');
+ ok.className='working';
+ ok.textContent='removing — a graph has no undo, so it rebuilds…';
  await fetch('/reset',{method:'POST'});
  document.querySelectorAll('.m.new').forEach(e=>e.remove());
- document.getElementById('ok').textContent='\\u21a9 removed';
+ ok.className='ok'; ok.textContent='↩ back to the original channel';
 }
 const f=document.getElementById('feed');f.scrollTop=f.scrollHeight;
 </script></body></html>"""
