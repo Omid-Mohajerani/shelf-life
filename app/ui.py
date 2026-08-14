@@ -1,5 +1,22 @@
-"""The page. Single file, no external assets - a demo that fetches from the
-internet is a demo that can fail in a back courtyard in Kreuzberg."""
+"""The page. No external assets - a demo that fetches from the internet is a demo
+that can fail in a back courtyard in Kreuzberg. The vendor marks are inlined as
+data URIs for the same reason."""
+import base64
+import os
+
+_ASSETS = os.path.join(os.path.dirname(__file__), "assets")
+
+
+def _logo(name: str, mime: str) -> str:
+    try:
+        with open(os.path.join(_ASSETS, name), "rb") as f:
+            return f"data:{mime};base64," + base64.b64encode(f.read()).decode()
+    except Exception:
+        return ""
+
+
+LOGOS = {"qdrant": _logo("qdrant.png", "image/png"),
+         "cognee": _logo("cognee.jpg", "image/jpeg")}
 
 # Two questions, not four. Two minutes is an argument, not a tour.
 # The other two stay reachable by typing, so a judge poking at the URL later
@@ -52,10 +69,8 @@ button:hover{border-color:var(--blu);transform:translateY(-1px)}
 .leg{display:flex;align-items:center;gap:14px;padding:9px 0;font-size:14.5px;
  color:var(--dim);opacity:.4;transition:opacity .35s}
 .leg.on,.leg.done{opacity:1}
-.leg .mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
- font:800 10.5px/1 ui-sans-serif;color:#fff;letter-spacing:-.3px;flex:0 0 26px}
-.leg.q .mark{background:#b02a37}
-.leg.c .mark{background:#6f42c1}
+.leg .mark{width:28px;height:28px;border-radius:7px;flex:0 0 28px;object-fit:contain;
+ background:#fff;border:1px solid var(--line);padding:2px}
 .leg .nm{font-weight:600;color:var(--fg);min-width:186px}
 .leg .st{flex:1}
 .leg .ms{font:12.5px ui-monospace,Menlo,monospace;color:var(--grn);font-weight:600}
@@ -157,11 +172,7 @@ button:hover{border-color:var(--blu);transform:translateY(-1px)}
    onkeydown="if(event.key=='Enter')go()">
  <button class=go onclick=go()>Ask</button>
 </div>
-<div class=try>Try:
- <a data-q="Our SFTP export connector won't connect but the credentials are correct. What is wrong?"
-    onclick="preset(this.dataset.q)">the docs are wrong</a>
- <a data-q="The dialer isn't calling and the segment says Data Exhausted. What do I do?"
-    onclick="preset(this.dataset.q)">the answer was retracted</a>
+<div class=try>Also try:
  <a data-q="I am new here. What gotchas does this team know that are not in the official documentation?"
     onclick="preset(this.dataset.q)">what does this team know that the docs don't?</a>
  <span class=off><a onclick=resetDemo() id=rst>reset</a>
@@ -169,6 +180,7 @@ button:hover{border-color:var(--blu);transform:translateY(-1px)}
 </div>
 
 <div class=pipe id=pipe></div>
+<script>const LOGO_Q="__LOGO_Q__",LOGO_C="__LOGO_C__";</script>
 <div id=out class=muted>Ask something.</div>
 
 <div class=foot><div><b>shelflife.ringamo.dev</b>
@@ -195,9 +207,9 @@ const QUIPS=["reading 14 months of scrollback\\u2026","asking the docs, politely
 let quipTimer=null,t0=0;
 
 function legs(state,busy){
- const L=[['q','QD','Qdrant','scanning 32 messages for the evidence'],
-          ['c','CG','cognee \u00b7 docs','reading 8 pages of official documentation'],
-          ['c','CG','cognee \u00b7 #voice-eng','reading 8 threads, 14 months of channel']];
+ const L=[['q','Qdrant','scanning 32 messages for the evidence'],
+          ['c','cognee \u00b7 docs','reading 8 pages of official documentation'],
+          ['c','cognee \u00b7 #voice-eng','reading 8 threads, 14 months of channel']];
  const p=document.getElementById('pipe');
  p.className='pipe'+(busy?' busy':'');
  p.innerHTML=L.map((l,i)=>{
@@ -205,8 +217,9 @@ function legs(state,busy){
   const right = st=='done'&&ms!=null ? '<span class=ms>'+ms+'ms</span>'
               : st=='done' ? '<span class=tick>\u2713</span>'
               : st=='on'   ? '<span class=spin></span>' : '';
-  return '<div class="leg '+l[0]+' '+st+'"><span class=mark>'+l[1]+'</span>'+
-   '<span class=nm>'+l[2]+'</span><span class=st>'+l[3]+'</span>'+right+'</div>';
+  return '<div class="leg '+l[0]+' '+st+'">'+
+   '<img class=mark src="'+(l[0]=='q'?LOGO_Q:LOGO_C)+'" alt="">'+
+   '<span class=nm>'+l[1]+'</span><span class=st>'+l[2]+'</span>'+right+'</div>';
  }).join('')+(busy?'<div class=quip id=quip></div>':'');
 }
 

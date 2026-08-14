@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from live import inject, reset, state
 from shelflife import answer, verdict_only
 import chat
-from ui import PAGE
+from ui import LOGOS, PAGE
 
 app = FastAPI(title="Shelf Life")
 
@@ -19,7 +19,8 @@ app = FastAPI(title="Shelf Life")
 
 
 def render() -> str:
-    return PAGE
+    return (PAGE.replace("__LOGO_Q__", LOGOS["qdrant"])
+                .replace("__LOGO_C__", LOGOS["cognee"]))
 
 
 @app.get("/", response_class=HTMLResponse)
