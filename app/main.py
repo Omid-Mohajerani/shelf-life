@@ -24,8 +24,19 @@ def render() -> str:
                 .replace("__LOGO_C__", LOGOS["cognee"]))
 
 
+@app.get("/talk", response_class=HTMLResponse)
+async def talk() -> str:
+    return talk_page()
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index() -> str:
+    """Voice first - it is the better front door. The text version is /text."""
+    return talk_page()
+
+
+@app.get("/text", response_class=HTMLResponse)
+async def text_version() -> str:
     return render()
 
 
@@ -178,10 +189,16 @@ async def vapi(req: Request) -> JSONResponse:
     return JSONResponse({"results": out})
 
 
+def talk_page() -> str:
+    return (TALK.replace("__KEY__", os.environ.get("VAPI_PUBLIC_KEY", ""))
+                .replace("__ASSISTANT__", os.environ.get("VAPI_ASSISTANT_ID", ""))
+                .replace("__LOGO_Q__", LOGOS["qdrant"])
+                .replace("__LOGO_C__", LOGOS["cognee"]))
+
+
 @app.get("/talk", response_class=HTMLResponse)
 async def talk() -> str:
-    return TALK.replace("__KEY__", os.environ.get("VAPI_PUBLIC_KEY", "")) \
-               .replace("__ASSISTANT__", os.environ.get("VAPI_ASSISTANT_ID", ""))
+    return talk_page()
 
 
 @app.get("/health")

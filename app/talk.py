@@ -85,6 +85,46 @@ button:disabled{background:#2a2a3a;box-shadow:none;cursor:default;transform:none
  color:var(--dim);margin-bottom:3px}
 a{color:#a78bfa;text-decoration:none}
 .foot{margin-top:40px;color:#6b7280;font-size:13.5px}
+
+/* the work, shown while it talks */
+.work{width:100%;max-width:700px;margin-top:30px;text-align:left}
+.pipe{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+ border-radius:16px;padding:16px 20px}
+.leg{display:flex;align-items:center;gap:13px;padding:8px 0;font-size:14px;
+ color:var(--dim);opacity:.35;transition:opacity .35s}
+.leg.on,.leg.done{opacity:1}
+.leg img{width:24px;height:24px;border-radius:6px;background:#fff;padding:2px;
+ flex:0 0 24px;object-fit:contain}
+.leg .nm{font-weight:600;color:#eef1f8;min-width:172px}
+.leg .st{flex:1}
+.leg .ms{font:12px ui-monospace,Menlo,monospace;color:#5eead4;font-weight:600}
+.sp{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.15);
+ border-top-color:#a78bfa;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.vd{border-radius:14px;padding:16px 20px;margin-top:14px;border:1px solid;font-size:15px}
+.vd .lv{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;
+ margin-bottom:5px;opacity:.9}
+.vd .tr{margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.14);
+ font:11.5px/1.5 ui-monospace,Menlo,monospace;opacity:.72}
+.good{background:rgba(16,185,129,.13);border-color:#10b981;color:#6ee7b7}
+.superseded{background:rgba(244,63,94,.13);border-color:#f43f5e;color:#fda4af}
+.unproven,.stale{background:rgba(234,179,8,.13);border-color:#eab308;color:#fde047}
+.cards{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-top:12px}
+@media(max-width:700px){.cards{grid-template-columns:1fr}}
+.cd{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+ border-radius:14px;padding:15px 18px;font-size:14px}
+.cd h4{margin:0 0 8px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+ color:#a78bfa}
+.cd.t h4{color:#5eead4}
+.ask{margin-top:12px;background:rgba(255,255,255,.04);
+ border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 18px}
+.ask h4{margin:0 0 10px;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+ color:var(--dim)}
+.who{display:inline-flex;align-items:center;gap:11px;margin:0 10px 6px 0}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+ font-weight:700;font-size:12.5px;color:#fff}
+.who b{display:block;font-size:14.5px;color:#eef1f8}
+.who i{font-style:normal;color:var(--dim);font-size:12px}
 </style></head><body>
 <div class=glow3></div>
 <div class=wrap id=wrap>
@@ -111,13 +151,15 @@ a{color:#a78bfa;text-decoration:none}
  </ul>
 </div>
 
+<div class=work id=work></div>
 <div class=log id=log></div>
-<div class=foot><a href="/">the web version</a> &middot; <a href="/chat">#voice-eng</a></div>
+<div class=foot><a href="/text">the text version</a> &middot; <a href="/chat">#voice-eng</a></div>
 </div>
 
 <script type="module">
 import Vapi from "https://esm.sh/@vapi-ai/web@2.3.8";
 const KEY="__KEY__", ASSISTANT="__ASSISTANT__";
+const LOGO_Q="__LOGO_Q__", LOGO_C="__LOGO_C__";
 const btn=document.getElementById('btn'), note=document.getElementById('note');
 const wrap=document.getElementById('wrap'), orb=document.getElementById('orb');
 const orbwrap=document.getElementById('orbwrap');
@@ -187,6 +229,58 @@ function say(who,text,mine){
  log.appendChild(d); d.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
+// The agent answers over the server webhook; the browser runs the SAME query so
+// the room can watch the work while it talks. Two views of one memory.
+const work=document.getElementById('work');
+function esc(t){return (t||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function md(t){return esc(t).replace(/[*][*](.+?)[*][*]/g,'<b>$1</b>')
+ .replace(/[[]OFFICIAL DOCUMENTATION[\]]\s*/g,'').replace(/[[]TEAM CHANNEL[^\]]*[\]]\s*/g,'')}
+function legs(state,ms){
+ const L=[['q','Qdrant','scanning 32 messages'],
+          ['c','cognee · docs','reading 8 doc pages'],
+          ['c','cognee · #voice-eng','reading 8 threads']];
+ return '<div class=pipe>'+L.map((l,i)=>{
+  const st=state[i]||'', v=ms&&ms[i]!=null?ms[i]:null;
+  const r = st==='done'&&v!=null?'<span class=ms>'+v+'ms</span>'
+          : st==='done'?'<span class=ms>done</span>'
+          : st==='on'?'<span class=sp></span>':'';
+  return '<div class="leg '+st+'"><img src="'+(l[0]==='q'?LOGO_Q:LOGO_C)+'" alt="">'+
+   '<span class=nm>'+l[1]+'</span><span class=st>'+l[2]+'</span>'+r+'</div>';
+ }).join('')+'</div>';
+}
+function verdictHtml(t,d){
+ let h='<div class="vd '+t.level+'"><div class=lv>'+esc(t.level)+'</div>'+
+  esc(t.headline)+(t.signals.length?'<br>'+t.signals.map(esc).join('<br>'):'')+
+  (t.trace?'<div class=tr>'+esc(t.trace)+'</div>':'')+'</div>';
+ if(t.ask&&t.ask.length){
+  const P=['#8b5cf6','#10b981','#ec4899','#f59e0b','#3b82f6'];
+  h+='<div class=ask><h4>Who to ask</h4>'+t.ask.map((p,i)=>{
+   const ini=p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+   return '<span class=who><span class=av style="background:'+P[i%P.length]+'">'+ini+
+    '</span><span><b>'+esc(p.name)+'</b><i>'+esc(p.title)+' · '+p.n+' message'+
+    (p.n>1?'s':'')+', latest '+esc(p.latest)+'</i></span></span>';
+  }).join('')+'</div>';
+ }
+ if(d) h+='<div class=cards><div class=cd><h4>Official documentation</h4>'+
+   md(d.docs.answer.slice(0,420))+'</div><div class="cd t"><h4>What the team found</h4>'+
+   md(d.channel.answer.slice(0,420))+'</div></div>';
+ return h;
+}
+window.showWork=async function(q){
+ const body=JSON.stringify({question:q});
+ work.innerHTML=legs(['on','on','on']);
+ const vr=await fetch('/verdict',{method:'POST',
+   headers:{'Content-Type':'application/json'},body:body});
+ const v=await vr.json();
+ const qms=(v.timing||{}).qdrant_ms;
+ work.innerHTML=legs(['done','on','on'],[qms,null,null])+verdictHtml(v.trust,null);
+ const r=await fetch('/ask',{method:'POST',
+   headers:{'Content-Type':'application/json'},body:body});
+ const d=await r.json(); const tm=d.timing||{};
+ work.innerHTML=legs(['done','done','done'],
+   [tm.qdrant_ms||qms,tm.cognee_docs_ms,tm.cognee_channel_ms])+verdictHtml(d.trust,d);
+}
+
 window.toggle=async function(){
  if(live){ vapi.stop(); return; }
  if(!vapi){
@@ -202,7 +296,10 @@ window.toggle=async function(){
     if(m.type==='transcript'&&m.transcriptType==='final')
       say(m.role==='user'?'you':'shelf life',m.transcript,m.role==='user');
     if(m.type==='tool-calls'){thinkUntil=Date.now()+45000;
-      setMode('think','Querying Qdrant and cognee…');}
+      setMode('think','Querying Qdrant and cognee…');
+      const c=(m.toolCalls||m.toolCallList||[])[0]; let a=(c&&c.function&&c.function.arguments)||{};
+      if(typeof a==='string'){try{a=JSON.parse(a);}catch(e){a={};}}
+      if(a.question) window.showWork(a.question);}
   });
   vapi.on('error',e=>{live=false;stopMic();btn.textContent='Talk to it';btn.className='';
     setMode('idle','Error: '+((e&&e.message)||'call failed'));});

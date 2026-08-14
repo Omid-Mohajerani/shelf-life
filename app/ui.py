@@ -163,6 +163,7 @@ button:hover{border-color:var(--blu);transform:translateY(-1px)}
  animation:pulse 1s infinite}
 </style></head><body><div class=wrap>
 <header><h1>Shelf&nbsp;Life</h1><em>every answer in a company has one</em>
+ <a class=chan href="/">&larr; voice</a>
  <a class=chan href="/chat" target="_blank">#voice-eng &rarr;</a></header>
 <p class=sub><b>What the docs say</b> &middot; <b>what the team found</b> &middot;
  <b>how much to trust it</b> &middot; <b>who to ask</b></p>
