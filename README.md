@@ -4,7 +4,16 @@
 
 Built for *Give Your Slack a Memory* — the Cognee × Qdrant Hack Night, Berlin, 2026-08-14.
 
-**Live:** https://shelflife.ringamo.dev
+| | |
+|---|---|
+| **Live — talk to it** | https://shelflife.ringamo.dev |
+| **Live — type to it** | https://shelflife.ringamo.dev/text |
+| **The channel it reads** | https://shelflife.ringamo.dev/chat |
+
+![Shelf Life, asked out loud](docs/screenshot-voice.png)
+
+*Ask it out loud. While it answers, the room watches Qdrant land in ~120ms and
+both cognee legs take ~20s — then the verdict, who to ask, and both sources.*
 
 ---
 
@@ -77,6 +86,18 @@ Real cases, from real hard-won knowledge about a real product:
 The last one is the point of the whole project. A similarity search hands you a colleague's
 guess as though it were fact. Shelf Life says *"treat as a guess — the author said so
 themselves"* and shows you the message where he retracted it.
+
+## Screenshots
+
+**The text version** — same memory, typed. `#voice-eng` and the official docs answered
+separately, so their disagreement stays visible.
+
+![The text version](docs/screenshot-text.png)
+
+**The channel** — fourteen months of it, with the hedges and retractions marked. Post here
+and the memory revises what it knows.
+
+![The channel](docs/screenshot-channel.png)
 
 ## Run it
 
