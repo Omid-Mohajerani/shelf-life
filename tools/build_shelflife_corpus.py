@@ -24,19 +24,20 @@ import os
 import re
 import sys
 
-DOCS_EXPORT = os.path.expanduser("~/docs-export")
+DOCS_EXPORT = os.path.expanduser(os.environ.get("SHELFLIFE_DOCS_EXPORT", "~/docs-export"))
 
-# Real doc pages, by Confluence id. Used only when the export is present locally.
-DOC_PAGES = {
-    1001: "SFTP Connector: Data Collection",
-    1002: "File Security in FTP Connectors",
-    1003: "Callback Manager",
-    1004: "Callbacks Overview",
-    1005: "Different Types of Segments",
-    1006: "Filtering & Segmentation",
-    1007: "Outbound Voice Features with VoiceConnect Compatibility",
-    1008: "API Connector: Data Collection",
-}
+# The doc pages we mirror, by title. Matched against a local Confluence-style
+# export when one is present; see build_docs().
+DOC_TITLES = [
+    "SFTP Connector: Data Collection",
+    "File Security in FTP Connectors",
+    "Callback Manager",
+    "Callbacks Overview",
+    "Different Types of Segments",
+    "Filtering & Segmentation",
+    "Outbound Voice Features with VoiceConnect Compatibility",
+    "API Connector: Data Collection",
+]
 
 # Fallback stubs - paraphrased, not vendor text. These carry the same *shape* as
 # the real pages: authoritative tone, no mention of the failure modes that
@@ -242,14 +243,16 @@ def build_docs(out: str) -> list:
     # --stubs forces the paraphrased set even when the export is present. Used to
     # build the published corpus: vendor documentation is not ours to redistribute.
     if os.path.exists(idx_path) and "--stubs" not in sys.argv:
-        idx = {int(p["id"]): p for p in json.load(open(idx_path))}
-        for pid, title in DOC_PAGES.items():
-            f = os.path.join(DOCS_EXPORT, "pages", f"{pid}.json")
-            if not (pid in idx and os.path.exists(f)):
+        idx = {p["title"]: p for p in json.load(open(idx_path))}
+        for title in DOC_TITLES:
+            meta = idx.get(title)
+            if meta is None:
+                continue
+            f = os.path.join(DOCS_EXPORT, "pages", f"{meta['id']}.json")
+            if not os.path.exists(f):
                 continue
             page = json.load(open(f))
             body = strip_html(page.get("body_storage") or "")[:6000]
-            meta = idx[pid]
             written.append({
                 "source": "docs", "title": page["title"],
                 "version": meta["version"], "updated": meta["versionAt"][:10],

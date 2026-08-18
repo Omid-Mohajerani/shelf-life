@@ -22,7 +22,7 @@ import time
 import urllib.error
 import urllib.request
 
-ENVF = os.path.expanduser("~/.shelflife.env")
+ENVF = os.path.expanduser(os.environ.get("SHELFLIFE_ENV_FILE", "~/.shelflife.env"))
 env = dict(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", open(ENVF).read(), re.M))
 BASE = env["COGNEE_CLOUD_URL"].rstrip("/")
 KEY = env["COGNEE_CLOUD_API_KEY"]
